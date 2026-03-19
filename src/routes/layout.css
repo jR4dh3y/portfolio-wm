@@ -207,3 +207,4 @@
 /* height fix */
 /* layout sync */
 /* color variables */
+body::-webkit-scrollbar { display: none; }
