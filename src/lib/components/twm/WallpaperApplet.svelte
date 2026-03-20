@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { Image, RotateCw, Settings2 } from 'lucide-svelte';
+	import SunIcon from '$lib/components/twm/icons/SunIcon.svelte';
+	import TerminalIcon from '$lib/components/twm/icons/TerminalIcon.svelte';
 
 	let {
 		activeWallpaperLabel = 'wallpaper',
@@ -20,7 +21,7 @@
 		class="inline-flex items-center gap-2 border-r border-black/15 bg-accent px-2 py-1 transition-colors hover:bg-highlight hover:text-black"
 		onclick={onCycle}
 	>
-		<RotateCw class="h-4 w-4" />
+		<SunIcon class="h-4 w-4" />
 		<span class="hidden xl:inline">next</span>
 	</button>
 	<button
@@ -28,8 +29,8 @@
 		class="inline-flex items-center gap-2 bg-accent px-2 py-1 transition-colors hover:bg-highlight hover:text-black"
 		onclick={onOpenSettings}
 	>
-		<Image class="h-4 w-4" />
+		<TerminalIcon class="h-4 w-4" />
 		<span class="max-w-32 truncate">{activeWallpaperLabel}</span>
-		<Settings2 class="h-3.5 w-3.5 opacity-70" />
+		<SunIcon class="h-3.5 w-3.5 opacity-70" />
 	</button>
 </div>

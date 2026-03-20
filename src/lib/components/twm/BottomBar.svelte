@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { MapPin } from 'lucide-svelte';
+	import WallpaperApplet from '$lib/components/twm/WallpaperApplet.svelte';
 	import type {
 		BottomBarAppletId,
 		BottomBarAppletPlacement,
@@ -18,7 +18,10 @@
 		appletPlacements,
 		activeWorkspaceId,
 		onSelectWorkspace,
-		onToggleHelp
+		onToggleHelp,
+		onCycleWallpaper,
+		onOpenWallpaperModal,
+		activeWallpaperLabel = 'wallpaper'
 	}: {
 		name: string;
 		lastName: string;
@@ -30,6 +33,9 @@
 		activeWorkspaceId: WorkspaceId;
 		onSelectWorkspace: (workspaceId: WorkspaceId) => void;
 		onToggleHelp: () => void;
+		onCycleWallpaper: () => void;
+		onOpenWallpaperModal: () => void;
+		activeWallpaperLabel?: string;
 	} = $props();
 
 	function getAppletsForZone(zone: 'left' | 'right'): BottomBarAppletId[] {
@@ -44,9 +50,9 @@
 </script>
 
 <footer
-	class="mt-2 flex shrink-0 flex-col gap-2 border border-border bg-surface px-3 py-2 font-mono text-[13px] text-fg uppercase shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:flex-row md:items-center md:justify-between"
+	class="relative z-10 mt-2 flex w-full shrink-0 flex-col gap-2 border border-border bg-surface px-3 py-2 font-mono text-[13px] text-fg uppercase shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:flex-row md:items-center md:justify-between"
 >
-	<div class="flex flex-wrap items-center gap-2">
+	<div class="flex flex-wrap items-center gap-2 md:min-w-0">
 		{#each leftApplets as appletId (appletId)}
 			{#if appletId === 'identity'}
 				<span
@@ -58,7 +64,7 @@
 				<span
 					class="inline-flex items-center gap-1 border border-caution bg-caution px-2 py-1 text-black"
 				>
-					<MapPin class="h-4 w-4" />{role}
+					<span aria-hidden="true">LOC</span>{role}
 				</span>
 			{:else if appletId === 'active-pane'}
 				<span
@@ -78,10 +84,16 @@
 							}`}
 							onclick={() => onSelectWorkspace(workspace.id)}
 						>
-							${workspace.label}
+							{workspace.label}
 						</button>
 					{/each}
 				</div>
+			{:else if appletId === 'wallpaper'}
+				<WallpaperApplet
+					{activeWallpaperLabel}
+					onCycle={onCycleWallpaper}
+					onOpenSettings={onOpenWallpaperModal}
+				/>
 			{:else if appletId === 'help'}
 				<button
 					type="button"
@@ -99,7 +111,7 @@
 			{/if}
 		{/each}
 	</div>
-	<div class="flex flex-wrap items-center gap-2 md:justify-end">
+	<div class="flex flex-wrap items-center gap-2 md:ml-auto md:shrink-0 md:justify-end">
 		{#each rightApplets as appletId (appletId)}
 			{#if appletId === 'identity'}
 				<span
@@ -111,7 +123,7 @@
 				<span
 					class="inline-flex items-center gap-1 border border-caution bg-caution px-2 py-1 text-black"
 				>
-					<MapPin class="h-4 w-4" />{role}
+					<span aria-hidden="true">LOC</span>{role}
 				</span>
 			{:else if appletId === 'active-pane'}
 				<span
@@ -131,10 +143,16 @@
 							}`}
 							onclick={() => onSelectWorkspace(workspace.id)}
 						>
-							${workspace.label}
+							{workspace.label}
 						</button>
 					{/each}
 				</div>
+			{:else if appletId === 'wallpaper'}
+				<WallpaperApplet
+					{activeWallpaperLabel}
+					onCycle={onCycleWallpaper}
+					onOpenSettings={onOpenWallpaperModal}
+				/>
 			{:else if appletId === 'help'}
 				<button
 					type="button"

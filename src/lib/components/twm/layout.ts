@@ -8,7 +8,7 @@ import ProjectsPane from '$lib/components/twm/ProjectsPane.svelte';
 import SkillsPane from '$lib/components/twm/SkillsPane.svelte';
 
 export type PaneId = 'homelab' | 'hero' | 'about' | 'skills' | 'projects' | 'experience';
-export type WorkspaceId = 'workspace-1' | 'workspace-2';
+export type WorkspaceId = 'workspace-1' | 'workspace-2' | 'workspace-3';
 export type Direction = 'left' | 'right' | 'up' | 'down';
 
 export type PaneMeta = {
@@ -37,6 +37,7 @@ export type BottomBarAppletId =
 	| 'role'
 	| 'active-pane'
 	| 'workspaces'
+	| 'wallpaper'
 	| 'help'
 	| 'time';
 
@@ -100,11 +101,6 @@ export const workspaces: WorkspaceMeta[] = [
 		hint: 'intro / context',
 		columns: [
 			{
-				id: 'homelab-column',
-				className: 'w-[50%] min-w-[50%] max-w-[50%]',
-				panes: [panes.homelab]
-			},
-			{
 				id: 'hero-column',
 				className: 'w-[50%] min-w-[50%] max-w-[50%]',
 				panes: [panes.hero]
@@ -113,6 +109,11 @@ export const workspaces: WorkspaceMeta[] = [
 				id: 'info-column',
 				className: 'workspace-column-stack w-[50%] min-w-[50%] max-w-[50%]',
 				panes: [panes.about, panes.skills]
+			},
+			{
+				id: 'homelab-column',
+				className: 'w-[50%] min-w-[50%] max-w-[50%]',
+				panes: [panes.homelab]
 			}
 		]
 	},
@@ -132,6 +133,12 @@ export const workspaces: WorkspaceMeta[] = [
 				panes: [panes.experience]
 			}
 		]
+	},
+	{
+		id: 'workspace-3',
+		label: '3',
+		hint: 'wallpaper',
+		columns: []
 	}
 ];
 
@@ -141,8 +148,9 @@ export const bottomBarAppletPlacements: BottomBarAppletPlacement[] = [
 	{ id: 'workspaces', zone: 'left', order: 2 },
 	{ id: 'active-pane', zone: 'left', order: 3 },
 	{ id: 'help', zone: 'right', order: 1 },
-	{ id: 'role', zone: 'right', order: 2 },
-	{ id: 'time', zone: 'right', order: 3 }
+	{ id: 'wallpaper', zone: 'right', order: 2 },
+	{ id: 'role', zone: 'right', order: 3 },
+	{ id: 'time', zone: 'right', order: 4 }
 ];
 
 export const mobilePaneOrder: PaneMeta[] = [
@@ -174,9 +182,9 @@ export function getWorkspaceById(workspaceId: WorkspaceId): WorkspaceMeta {
 	return workspaces.find((workspace) => workspace.id === workspaceId) ?? workspaces[0];
 }
 
-export function getFirstPaneIdForWorkspace(workspaceId: WorkspaceId): PaneId {
+export function getFirstPaneIdForWorkspace(workspaceId: WorkspaceId): PaneId | null {
 	const workspace = getWorkspaceById(workspaceId);
-	return workspace.columns[0]?.panes[0]?.id ?? 'hero';
+	return workspace.columns[0]?.panes[0]?.id ?? null;
 }
 
 const paneNeighbors: Record<PaneId, Partial<Record<Direction, PaneId>>> = {

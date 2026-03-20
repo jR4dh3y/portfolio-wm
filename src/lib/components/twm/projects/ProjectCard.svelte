@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Project } from '$lib/data';
-	import * as Lucide from 'lucide-svelte';
 
 	let {
 		project,
@@ -45,7 +44,7 @@
 			aria-label={`Open ${project.title} source code`}
 			class="border border-border bg-surface p-2 text-dim transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 		>
-			<Lucide.Github size={16} />
+			<span aria-hidden="true" class="text-[10px] font-bold uppercase">GH</span>
 		</a>
 		{#if project.liveUrl}
 			<a
@@ -55,7 +54,7 @@
 				aria-label={`Open ${project.title} live site`}
 				class="border border-border bg-surface p-2 text-dim transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 			>
-				<Lucide.ArrowUpRight size={16} />
+				<span aria-hidden="true" class="text-[10px] font-bold uppercase">GO</span>
 			</a>
 		{/if}
 	</div>

@@ -27,9 +27,10 @@
 			.replace(/(^-|-$)+/g, '');
 	}
 
-	function openProject(index: number) {
+	function openProject(index: number, nextSourcePane: PaneId = 'projects') {
 		projectsListScrollTop = projectsListContainer?.scrollTop ?? projectsListScrollTop;
 		lastFocusedCardId = `project-card-${index}`;
+		sourcePane = nextSourcePane;
 		selectedProjectIndex = index;
 	}
 
@@ -91,8 +92,7 @@
 			return;
 		}
 
-		sourcePane = request.sourcePane ?? 'projects';
-		openProject(nextIndex);
+		openProject(nextIndex, request.sourcePane ?? 'projects');
 		clearProjectNavigationRequest();
 	});
 </script>
@@ -103,13 +103,17 @@
 	<ProjectDetailView project={selectedProject} onBack={closeProject} />
 {:else}
 	<div
-		class="h-full w-full overflow-y-auto p-4 sm:p-8"
+		class="no-scrollbar h-full w-full overflow-y-auto p-4 sm:p-8"
 		bind:this={projectsListContainer}
 		onscroll={handleProjectsListScroll}
 	>
 		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 			{#each projects as project, index (project.title)}
-				<ProjectCard {project} cardId={`project-card-${index}`} onOpen={() => openProject(index)} />
+				<ProjectCard
+					{project}
+					cardId={`project-card-${index}`}
+					onOpen={() => openProject(index, 'projects')}
+				/>
 			{/each}
 		</div>
 	</div>

@@ -1,11 +1,14 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { fromStore } from 'svelte/store';
+	import { onMount, untrack } from 'svelte';
 	import { profile } from '$lib/data';
 	import BottomBar from '$lib/components/twm/BottomBar.svelte';
 	import TwmPane from '$lib/components/twm/TwmPane.svelte';
+	import WallpaperModal from '$lib/components/twm/WallpaperModal.svelte';
 	import {
-		projectNavigationRequest,
+		projectPaneFocusRequest,
 		returnToPane,
+		clearProjectPaneFocusRequest,
 		clearReturnToPane
 	} from '$lib/stores/project-navigation';
 	import {
@@ -20,15 +23,25 @@
 		type Direction,
 		type PaneId
 	} from '$lib/components/twm/layout';
+	import { createWallpaperState } from '$lib/stores/wallpaper';
+	import type { PageData } from './$types';
 
 	const desktopViewportId = 'workspace-viewport';
+
+	let { data }: { data: PageData } = $props();
 
 	let activePaneId = $state<PaneId>('hero');
 	let time = $state(new Date().toLocaleTimeString());
 	let showHelp = $state(false);
 	let scrollSyncFrame = 0;
+	const wallpaperState = createWallpaperState(untrack(() => data.bundledWallpapers));
+	const activeWallpaper = fromStore(wallpaperState.activeWallpaper);
+	const wallpaperModalOpen = fromStore(wallpaperState.modalOpen);
+	const wallpaperDraftUrl = fromStore(wallpaperState.draftUrl);
+	const wallpaperErrorMessage = fromStore(wallpaperState.errorMessage);
+	let activeWorkspaceId = $state<(typeof workspaces)[number]['id']>('workspace-1');
 
-	let activeWorkspace = $derived(getWorkspaceById(getWorkspaceIdForPane(activePaneId)));
+	let activeWorkspace = $derived(getWorkspaceById(activeWorkspaceId));
 
 	function isDesktopViewport(): boolean {
 		return typeof window !== 'undefined' && window.matchMedia('(min-width: 48rem)').matches;
@@ -47,6 +60,7 @@
 
 	function focusPane(paneId: PaneId, shouldFocus = true) {
 		activePaneId = paneId;
+		activeWorkspaceId = getWorkspaceIdForPane(paneId);
 
 		const behavior = getScrollBehavior();
 		const paneDomId = isDesktopViewport() ? paneId : `mobile-${paneId}`;
@@ -71,6 +85,31 @@
 
 		if (shouldFocus) {
 			pane?.focus({ preventScroll: true });
+		}
+	}
+
+	function focusWorkspace(workspaceId: (typeof workspaces)[number]['id']) {
+		activeWorkspaceId = workspaceId;
+
+		if (!isDesktopViewport()) {
+			const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
+			if (firstPaneId) {
+				focusPane(firstPaneId);
+			}
+
+			return;
+		}
+
+		const workspace = document.getElementById(`workspace-${workspaceId}`);
+		workspace?.scrollIntoView({
+			behavior: getScrollBehavior(),
+			block: 'center',
+			inline: 'nearest'
+		});
+
+		const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
+		if (firstPaneId) {
+			focusPane(firstPaneId);
 		}
 	}
 
@@ -113,11 +152,46 @@
 		const viewportRect = viewport.getBoundingClientRect();
 		const centerX = viewportRect.left + viewportRect.width / 2;
 		const centerY = viewportRect.top + viewportRect.height / 2;
+		const workspaceEntries = workspaces
+			.map((workspace) => {
+				const element = document.getElementById(`workspace-${workspace.id}`);
+
+				if (!element) {
+					return null;
+				}
+
+				const rect = element.getBoundingClientRect();
+
+				return {
+					id: workspace.id,
+					rect
+				};
+			})
+			.filter((entry) => entry !== null);
+
+		let nearestWorkspaceId: (typeof workspaces)[number]['id'] | null = null;
+		let nearestWorkspaceScore = Number.POSITIVE_INFINITY;
+
+		for (const workspace of workspaceEntries) {
+			const deltaY = workspace.rect.top + workspace.rect.height / 2 - centerY;
+			const score = deltaY ** 2;
+
+			if (score < nearestWorkspaceScore) {
+				nearestWorkspaceScore = score;
+				nearestWorkspaceId = workspace.id;
+			}
+		}
+
+		if (nearestWorkspaceId) {
+			activeWorkspaceId = nearestWorkspaceId;
+		}
 
 		let nearestPaneId: PaneId | null = null;
 		let nearestScore = Number.POSITIVE_INFINITY;
 
-		for (const pane of document.querySelectorAll<HTMLElement>('[data-pane-id]')) {
+		for (const pane of document.querySelectorAll<HTMLElement>(
+			`#workspace-${nearestWorkspaceId ?? activeWorkspaceId} [data-pane-id]`
+		)) {
 			const rect = pane.getBoundingClientRect();
 			if (rect.width === 0 || rect.height === 0) {
 				continue;
@@ -140,6 +214,15 @@
 	}
 
 	function handleKey(event: KeyboardEvent) {
+		if (wallpaperModalOpen.current) {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				wallpaperState.closeModal();
+			}
+
+			return;
+		}
+
 		if (shouldIgnoreKeydown(event)) {
 			return;
 		}
@@ -194,16 +277,17 @@
 	}
 
 	function handleWorkspaceAppletClick(workspaceId: (typeof workspaces)[number]['id']) {
-		focusPane(getFirstPaneIdForWorkspace(workspaceId));
+		focusWorkspace(workspaceId);
 	}
 
 	$effect(() => {
-		const request = $projectNavigationRequest;
-		if (!request || typeof document === 'undefined') {
+		const focusRequest = $projectPaneFocusRequest;
+		if (!focusRequest || typeof document === 'undefined') {
 			return;
 		}
 
 		focusPane('projects');
+		clearProjectPaneFocusRequest();
 	});
 
 	$effect(() => {
@@ -219,6 +303,15 @@
 	function toggleHelp() {
 		showHelp = !showHelp;
 	}
+
+	function handleOpenWallpaperModal() {
+		showHelp = false;
+		wallpaperState.openModal();
+	}
+
+	function handleWallpaperError() {
+		wallpaperState.fallbackFromFailedWallpaper();
+	}
 </script>
 
 <svelte:window onkeydown={handleKey} />
@@ -228,8 +321,20 @@
 </svelte:head>
 
 <main
-	class="flex h-full w-full flex-col bg-bg p-[var(--workspace-pane-gap)] font-mono text-fg antialiased md:h-screen md:max-h-screen"
+	class="relative flex h-full w-full flex-col overflow-hidden bg-bg p-[var(--workspace-pane-gap)] font-mono text-fg antialiased md:h-screen md:max-h-screen"
 >
+	{#if activeWallpaper.current}
+		<div class="pointer-events-none absolute inset-0 hidden md:block">
+			<img
+				src={activeWallpaper.current.url}
+				alt={activeWallpaper.current.label}
+				class="h-full w-full object-cover"
+				onerror={handleWallpaperError}
+			/>
+			<div class="absolute inset-0 bg-linear-to-br from-bg/55 via-bg/35 to-bg/70"></div>
+		</div>
+	{/if}
+
 	{#if showHelp}
 		<div class="fixed inset-0 z-50 flex items-center justify-center bg-bg/90 p-4 backdrop-blur-sm">
 			<div class="border border-border bg-surface p-6">
@@ -251,7 +356,17 @@
 		</div>
 	{/if}
 
-	<div class="flex flex-1 flex-col gap-[var(--workspace-pane-gap)] md:min-h-0">
+	{#if wallpaperModalOpen.current}
+		<WallpaperModal
+			errorMessage={wallpaperErrorMessage.current}
+			inputValue={wallpaperDraftUrl.current}
+			onClose={wallpaperState.closeModal}
+			onInput={wallpaperState.updateDraftUrl}
+			onSave={wallpaperState.saveCustomWallpaper}
+		/>
+	{/if}
+
+	<div class="relative z-10 flex flex-1 flex-col gap-[var(--workspace-pane-gap)] md:min-h-0">
 		<div class="grid grid-cols-1 gap-[var(--workspace-pane-gap)] md:hidden">
 			{#each mobilePaneOrder as pane (pane.id)}
 				{@const PaneComponent = pane.component}
@@ -270,9 +385,7 @@
 			{/each}
 		</div>
 
-		<section
-			class="workspace-stage hidden min-h-0 flex-1 overflow-hidden border border-border/70 bg-surface/30 p-[var(--workspace-pane-gap)] md:flex"
-		>
+		<section class="hidden min-h-0 flex-1 overflow-hidden md:flex">
 			<div id={desktopViewportId} class="workspace-viewport flex-1" onscroll={queueViewportSync}>
 				{#each workspaces as workspace (workspace.id)}
 					<section id={`workspace-${workspace.id}`} class="workspace-sheet">
@@ -319,6 +432,9 @@
 		{workspaces}
 		{time}
 		role={profile.role}
+		activeWallpaperLabel={activeWallpaper.current?.label ?? 'wallpaper'}
+		onCycleWallpaper={wallpaperState.cycleWallpaper}
+		onOpenWallpaperModal={handleOpenWallpaperModal}
 		onToggleHelp={toggleHelp}
 	/>
 </main>
