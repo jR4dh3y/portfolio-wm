@@ -153,3 +153,4 @@
 		{/each}
 	</div>
 </footer>
+// bottom bar clickables
