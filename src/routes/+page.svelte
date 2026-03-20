@@ -296,6 +296,7 @@
 			return;
 		}
 
+		clearProjectPaneFocusRequest();
 		focusPane(targetPane);
 		clearReturnToPane();
 	});

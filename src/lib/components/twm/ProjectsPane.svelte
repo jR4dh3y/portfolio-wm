@@ -5,7 +5,7 @@
 	import {
 		projectNavigationRequest,
 		navigateBack,
-		clearProjectNavigationRequest
+		clearProjectPaneFocusRequest
 	} from '$lib/stores/project-navigation';
 	import type { PaneId } from '$lib/components/twm/layout';
 
@@ -43,7 +43,7 @@
 
 		// If we came from another pane, navigate back to it
 		if (originSourcePane !== 'projects') {
-			clearProjectNavigationRequest();
+			clearProjectPaneFocusRequest();
 			navigateBack(originSourcePane);
 			return;
 		}
@@ -88,12 +88,10 @@
 		});
 
 		if (nextIndex === -1) {
-			clearProjectNavigationRequest();
 			return;
 		}
 
 		openProject(nextIndex, request.sourcePane ?? 'projects');
-		clearProjectNavigationRequest();
 	});
 </script>
 
