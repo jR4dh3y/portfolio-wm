@@ -1,10 +1,10 @@
 export const profile = {
-	name: 'RADHEY',
-	lastName: 'KALRA',
+	name: 'Radhey',
+	lastName: 'Kalra',
 	photo: '/assets/about.jpg',
-	role: 'Full-stack Ecosystems / Audio Filters / Linux Infrastructures',
+	role: 'Jammu, India',
 	tagline:
-		'I engineer full-stack ecosystems, architect ML audio filters, and command Linux infrastructures. Creating digital experiences from the metal up.',
+		'I am a CSE student from India who Builds and Works on ML/audio processing, Full Stack Applications, and Linux Servers.',
 	about: [
 		"I'm a Computer Science Engineering student who loves messing around with tech, open source, and building cool stuff. I'm always curious about how things work and end up learning best by experimenting and trying new projects.",
 		"I'm efficient at leading groups, with experience gained through bootcamps, hackathons, and team projects. These opportunities have helped me improve my communication and leadership skills, manage responsibilities under pressure, and deliver results.",
@@ -36,26 +36,81 @@ export const experience = [
 	}
 ];
 
-export const projects = [
+export const homelab = {
+	paragraphs: [
+		'I enjoy building and maintaining infrastructure as much as writing applications. I run and maintain my own home server for hosting applications, internal tools, and experiments.',
+		'I deploy services using Docker, manage secure access through Cloudflare Tunnels, and self-host the tools I use daily. This setup powers dashboards, APIs, databases, and internal utilities, used daily for development and real-world testing.'
+	],
+	featuredProjects: {
+		boxbox: {
+			label: 'BoxBox',
+			slug: 'boxbox'
+		},
+		vidown: {
+			label: 'Vidown',
+			slug: 'vidown'
+		},
+		anyConverter: {
+			label: 'AnyConverter',
+			slug: 'anyconverter'
+		}
+	},
+	repo: {
+		label: 'homelabs',
+		href: 'https://github.com/jR4dh3y/homelabs'
+	},
+	technologies: [
+		'Ubuntu Server',
+		'Docker',
+		'Docker Compose',
+		'Cloudflare Tunnels',
+		'Nginx',
+		'SSH',
+		'Traefik'
+	]
+};
+
+export type Project = {
+	title: string;
+	slug?: string;
+	desc: string[];
+	image: string;
+	tags: string[];
+	githubUrl: string;
+	liveUrl?: string;
+	buttonTheme?: 'dark' | 'light';
+};
+
+export const projects: Project[] = [
 	{
 		title: 'UNet Audio Filter',
-		desc: 'Research project on audio enhancement using a custom U-Net-inspired architecture with an end-to-end training pipeline for denoising and source separation.',
+		desc: [
+			'Research project on audio enhancement using a custom U-Net-inspired architecture with an end-to-end training pipeline for denoising and source separation.'
+		],
 		image:
 			'https://raw.githubusercontent.com/jR4dh3y/unet-audiofilter/refs/heads/master/presentation/audio_comparison.png',
-		tags: ['Python', 'PyTorch', 'U-Net', 'Streamlit', 'Audio DSP', 'ML'],
-		githubUrl: 'https://github.com/jR4dh3y/unet-audiofilter'
+		tags: ['Python', 'PyTorch', 'U-Net', 'Transformer', 'Audio DSP', 'DL'],
+		githubUrl: 'https://github.com/jR4dh3y/unet-audiofilter',
+		buttonTheme: 'dark'
 	},
 	{
 		title: 'BoxBox',
-		desc: 'Fast, lightweight file manager for Linux servers with multi-mount browsing, chunked transfers, and real-time updates. Supports live media preview, streaming, downloads, and Monaco Editor integration for in-browser file editing.',
+		slug: 'boxbox',
+		desc: [
+			'Fast, lightweight file manager for Linux servers with multi-mount browsing, chunked transfers, and real-time updates.',
+			'Supports live media preview, streaming, downloads, and Monaco Editor integration for in-browser file editing.'
+		],
 		image: '/assets/files.png',
-		tags: ['SvelteKit', 'Go', 'Docker', 'WebSocket', 'Monaco Editor'],
+		tags: ['SvelteKit', 'Go', 'Docker', 'WebSocket'],
 		githubUrl: 'https://github.com/jR4dh3y/boxbox',
 		liveUrl: 'https://boxbox.radhey.dev/'
 	},
 	{
 		title: 'Pico32',
-		desc: 'Custom ESP32 wireless security firmware built around a serial TUI interface. Implements WiFi reconnaissance, packet capture, protocol-level attacks, and BLE device enumeration; all optimized to run on bare ESP32 dev boards.',
+		desc: [
+			'Custom ESP32 wireless security firmware built around a serial TUI interface.',
+			'Implements WiFi reconnaissance, packet capture, protocol-level attacks, and BLE device enumeration; all optimized to run on bare ESP32 dev boards.'
+		],
 		image: 'https://raw.githubusercontent.com/jR4dh3y/Pico32/master/assets/ss.png',
 		tags: ['ESP32', 'C++', 'PlatformIO', 'IoT', 'Firmware', 'WiFi', 'BLE'],
 		liveUrl: 'https://pico32.radhey.dev',
@@ -63,7 +118,9 @@ export const projects = [
 	},
 	{
 		title: 'Niri Dotfiles',
-		desc: 'Reproducible NiriWM rice with automation setup; a single-command bootstrapper that provisions packages, symlinks configs, copies assets, and enables desktop services on Arch Linux.',
+		desc: [
+			'Reproducible NiriWM rice with automation setup; a single-command bootstrapper that provisions packages, symlinks configs, copies assets, and enables desktop services on Arch Linux.'
+		],
 		image: '/assets/dots-niri.png',
 		tags: ['Niri', 'Wayland', 'Arch Linux', 'Shell', 'Ricing', 'Unix-Porn'],
 		liveUrl: 'https://rice.jr4.in',
@@ -71,28 +128,40 @@ export const projects = [
 	},
 	{
 		title: 'WallpyGui',
-		desc: 'Wallpaper manager for Wayland compositors with support for Video as Wallpaper.',
+		desc: ['Wallpaper manager for Wayland compositors with support for Video as Wallpaper.'],
 		image: '/assets/wall.png',
 		tags: ['Linux', 'GTK', 'Wayland', 'Python'],
 		githubUrl: 'https://github.com/jR4dh3y/wallpygui'
 	},
 	{
 		title: 'iwd-applet',
-		desc: 'Lightweight system tray applet for iwd (iNet wireless daemon) with a menu-driven UX.',
+		desc: ['Lightweight system tray applet for iwd (iNet wireless daemon) with a menu-driven UX.'],
 		image: '/assets/iwd-applet.png',
 		tags: ['Python', 'GTK', 'Linux', 'iwd'],
 		githubUrl: 'https://github.com/jR4dh3y/iwd-applet'
 	},
 	{
+		title: 'Victus Control (HPOmen-linux)',
+		desc: [
+			'Linux-first control surface for HP Victus hardware with a GTK4 monitor window, GTK3 tray companion, and probe CLI.',
+			'Provides D-Bus-powered hardware profile switching (cool, quiet, balanced, performance), validated fan modes, and temperature-aware automation.'
+		],
+		image: '/assets/omenmon.png',
+		tags: ['Vala', 'GTK4', 'D-Bus', 'Linux', 'Meson', 'AppIndicator'],
+		githubUrl: 'https://github.com/jR4dh3y/HPOmen-linux'
+	},
+	{
 		title: 'Terminal Doom',
-		desc: 'Doom styled game that runs in terminal using ncurses library.',
+		desc: ['Doom styled game that runs in terminal using ncurses library.'],
 		image: '/assets/doom.png',
 		tags: ['C++', 'ncurses', 'cmake', 'Game Dev'],
 		githubUrl: 'https://github.com/jR4dh3y/doom-in-terminal'
 	},
 	{
 		title: 'Community Leaderboard',
-		desc: 'Community management dashboard with user profiles, event tracking, points system, leaderboards, and admin controls',
+		desc: [
+			'Community management dashboard with user profiles, event tracking, points system, leaderboards, and admin controls.'
+		],
 		image: '/assets/dash.png',
 		tags: ['React', 'Node.js', 'Express', 'ConvexDB', 'Clerk Auth'],
 		liveUrl: 'https://dash.radhey.dev/',
@@ -100,35 +169,50 @@ export const projects = [
 	},
 	{
 		title: 'Hotel Booking',
-		desc: 'Full-stack booking app with auth & admin panel written in Svelte & Node.js, uses MySQL database.',
+		desc: [
+			'Full-stack booking app with auth & admin panel written in Svelte & Node.js, uses MySQL database.'
+		],
 		image: 'https://raw.githubusercontent.com/jR4dh3y/hotel-booking/refs/heads/main/ss/landing.png',
 		tags: ['Svelte', 'Node.js', 'Express', 'MySQL'],
 		githubUrl: 'https://github.com/jR4dh3y/hotel-booking'
 	},
 	{
 		title: 'vidown',
-		desc: 'Self-hosted video downloader supporting 1000+ sites with a beautiful SvelteKit UI.',
+		slug: 'vidown',
+		desc: ['Self-hosted video downloader supporting 1000+ sites with a beautiful SvelteKit UI.'],
 		image: '/assets/vidown.png',
 		tags: ['SvelteKit', 'Docker', 'Python', 'shadcn-svelte'],
-		githubUrl: 'https://github.com/jR4dh3y/vidown'
+		githubUrl: 'https://github.com/jR4dh3y/vidown',
+		liveUrl: 'https://dl.jr4.in/vidown'
+	},
+	{
+		title: 'AnyConverter',
+		slug: 'anyconverter',
+		desc: ['Self-hosted conversion utility for everyday media and document workflows.'],
+		image: '/assets/anyconv.png',
+		tags: ['SvelteKit', 'Docker'],
+		githubUrl: 'https://github.com/jR4dh3y/anyconverter',
+		liveUrl: 'https://anyconv.jr4.in'
 	},
 	{
 		title: 'TL;DR AI',
-		desc: 'Summarize WhatsApp Groups Chats using AI. Uses your openrouter API key to process data(you can you free models).',
+		desc: [
+			'Summarize WhatsApp Groups Chats using AI. Uses your openrouter API key to process data (you can use free models).'
+		],
 		image: 'https://github.com/jR4dh3y/tldr-desktop/raw/master/img/ss.png',
 		tags: ['React', 'Electron', 'TypeScript', 'OpenRouter'],
 		githubUrl: 'https://github.com/jR4dh3y/tldr-desktop'
 	},
 	{
 		title: 'Tenant Manager',
-		desc: 'A mobile app to manage tenant and log their electricity usages.',
+		desc: ['A mobile app to manage tenant and log their electricity usages.'],
 		image: 'https://github.com/jR4dh3y/tennet-manager/raw/master/photo.png',
 		tags: ['React Native', 'Expo', 'TypeScript'],
 		githubUrl: 'https://github.com/jR4dh3y/tennet-manager'
 	},
 	{
 		title: 'HowTo',
-		desc: 'Minimal technical tutorials and guides site built with Astro and Tailwind CSS.',
+		desc: ['Minimal technical tutorials and guides site built with Astro and Tailwind CSS.'],
 		image: '/assets/howto.png',
 		tags: ['Astro', 'Tailwind CSS', 'TypeScript', 'Guides'],
 		githubUrl: 'https://github.com/jR4dh3y/howTo',
@@ -138,14 +222,74 @@ export const projects = [
 
 export const skills = [
 	{
-		category: 'Languages',
-		items: ['Python', 'TypeScript', 'C/C++', 'Go', 'Rust', 'SQL', 'Lua', 'LaTeX']
+		title: 'Languages',
+		skills: [
+			{ name: 'Python' },
+			{ name: 'TypeScript' },
+			{ name: 'C/C++' },
+			{ name: 'Go' },
+			{ name: 'Rust' },
+			{ name: 'SQL' },
+			{ name: 'Lua' },
+			{ name: 'LaTeX' }
+		]
 	},
-	{ category: 'Frameworks', items: ['Next.js', 'SvelteKit', 'Astro', 'Expo', 'Tailwind', 'QML'] },
-	{ category: 'AI/ML', items: ['PyTorch', 'TensorFlow'] },
 	{
-		category: 'Cloud & DevOps',
-		items: ['AWS', 'GCP', 'Docker', 'Kubernetes', 'Terraform', 'Linux']
+		title: 'Frameworks',
+		skills: [
+			{ name: 'Next.js' },
+			{ name: 'SvelteKit' },
+			{ name: 'Astro' },
+			{ name: 'Expo' },
+			{ name: 'Tailwind' },
+			{ name: 'QML' }
+		]
+	},
+	{
+		title: 'AI/ML',
+		skills: [
+			{ name: 'PyTorch' },
+			{ name: 'TensorFlow' },
+			{ name: 'Transformers' },
+			{ name: 'scikit-learn' },
+			{ name: 'Pandas' },
+			{ name: 'OpenCV' }
+		]
+	},
+	{
+		title: 'Databases & Backend',
+		skills: [
+			{ name: 'ConvexDB' },
+			{ name: 'PostgreSQL' },
+			{ name: 'MySQL' },
+			{ name: 'Redis' },
+			{ name: 'Express' },
+			{ name: 'Node.js' },
+			{ name: 'Bun' }
+		]
+	},
+	{
+		title: 'DevOps & Cloud',
+		skills: [
+			{ name: 'Git' },
+			{ name: 'Docker' },
+			{ name: 'CMake' },
+			{ name: 'Cloudflare' },
+			{ name: 'Vercel' },
+			{ name: 'AWS' },
+			{ name: 'GCP' },
+			{ name: 'Kubernetes' }
+		]
+	},
+	{
+		title: 'Systems & OS',
+		skills: [
+			{ name: 'Linux' },
+			{ name: 'Windows' },
+			{ name: 'PowerShell' },
+			{ name: 'Bash' },
+			{ name: 'Networking' }
+		]
 	}
 ];
 
