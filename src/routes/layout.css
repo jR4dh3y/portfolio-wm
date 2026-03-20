@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@theme {
+	--font-sans: 'Syne', sans-serif;
+	--font-mono: 'Space Mono', monospace;
+	--font-syne: 'Syne', sans-serif;
+
+	--color-primary: hsl(278, 47%, 74%);
+	--color-primary-foreground: hsl(278, 47%, 10%);
+	--color-secondary: hsl(81, 95%, 67%);
+	--color-secondary-foreground: hsl(81, 95%, 10%);
+	--color-background: hsl(240, 2%, 17%);
+	--color-foreground: hsl(0, 0%, 98%);
+	--color-card: hsl(240, 2%, 20%);
+	--color-muted: hsl(240, 2%, 25%);
+
+	--color-grid-line: rgba(255, 255, 255, 0.05);
+
+	--animate-flicker: flicker 3s linear infinite;
+
+	@keyframes flicker {
+		0%,
+		19.999%,
+		22%,
+		62.999%,
+		64%,
+		64.999%,
+		70%,
+		100% {
+			opacity: 0.99;
+		}
+		20%,
+		21.999%,
+		63%,
+		63.999%,
+		65%,
+		69.999% {
+			opacity: 0.4;
+		}
+	}
+}
+
+@layer base {
+	:root {
+		--foreground: #fafafa;
+		--background: #2b2b2c;
+	}
+
+	body {
+		background-color: var(--color-background);
+		color: var(--color-foreground);
+		font-family: var(--font-mono);
+		overflow-x: hidden;
+	}
+
+	html {
+		scroll-behavior: smooth;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-family: var(--font-syne);
+		text-transform: uppercase;
+		font-weight: 800;
+		letter-spacing: -0.05em;
+	}
+}
+
+@layer utilities {
+	.brutalist-border {
+		border: 2px solid var(--color-foreground);
+		box-shadow: 4px 4px 0px var(--color-foreground);
+		transition:
+			transform 0.1s,
+			box-shadow 0.1s;
+	}
+
+	.brutalist-border:hover {
+		transform: translate(2px, 2px);
+		box-shadow: 2px 2px 0px var(--color-foreground);
+	}
+
+	.brutalist-border-primary {
+		border: 2px solid var(--color-primary);
+		box-shadow: 6px 6px 0px var(--color-primary);
+		transition:
+			transform 0.1s,
+			box-shadow 0.1s;
+	}
+
+	.brutalist-border-primary:hover {
+		transform: translate(4px, 4px);
+		box-shadow: 2px 2px 0px var(--color-primary);
+	}
+
+	.brutalist-border-secondary {
+		border: 2px solid var(--color-secondary);
+		box-shadow: 6px 6px 0px var(--color-secondary);
+		transition:
+			transform 0.1s,
+			box-shadow 0.1s;
+	}
+
+	.brutalist-border-secondary:hover {
+		transform: translate(4px, 4px);
+		box-shadow: 2px 2px 0px var(--color-secondary);
+	}
+
+	.bg-grid {
+		background-size: 40px 40px;
+		background-image:
+			linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+			linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px);
+	}
+}
