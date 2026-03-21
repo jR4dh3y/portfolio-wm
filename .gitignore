@@ -17,7 +17,11 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
-
+/.bun-install
+/.bun-tmp
+/.opencode
+/.vscode
+/SKILLS
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
