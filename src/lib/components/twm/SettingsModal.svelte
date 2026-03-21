@@ -82,7 +82,7 @@
 				</section>
 			</div>
 
-			<section class="border border-border bg-bg/40 p-5">
+			<section class="flex flex-col border border-border bg-bg/40 p-5">
 				<div class="mb-4 font-bold text-accent">~/wallpaper</div>
 				<p class="mb-3 text-sm text-dim">
 					Save an image link to include it in the wallpaper cycle.
@@ -107,7 +107,7 @@
 					<p class="mt-3 text-sm text-urgent">{errorMessage}</p>
 				{/if}
 
-				<div class="mt-6 flex justify-end gap-3">
+				<div class="mt-auto flex justify-end gap-3 pt-6">
 					<button
 						type="button"
 						class="border border-border px-4 py-2 text-xs text-dim uppercase transition-colors hover:border-accent hover:text-accent"
@@ -117,7 +117,7 @@
 					</button>
 					<button
 						type="button"
-						class="border border-highlight bg-highlight px-4 py-2 text-xs font-bold text-black uppercase transition-colors hover:border-accent hover:bg-accent"
+						class="border border-accent bg-accent px-4 py-2 text-xs font-bold text-black uppercase transition-colors hover:border-highlight hover:bg-highlight"
 						onclick={onSave}
 					>
 						Save & apply
