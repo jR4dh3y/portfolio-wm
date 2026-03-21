@@ -96,7 +96,7 @@
 {/snippet}
 
 <footer
-	class="relative z-10 mt-2 flex w-full shrink-0 flex-col gap-2 border border-border bg-surface px-3 py-2 font-mono text-[13px] text-fg uppercase shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:flex-row md:items-center md:justify-between"
+	class="bottom-bar relative z-10 mt-2 flex w-full shrink-0 flex-col gap-2 border border-border bg-surface px-3 py-2 font-mono text-[13px] text-fg uppercase shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:flex-row md:items-center md:justify-between"
 >
 	<div class="flex flex-wrap items-center gap-2 md:min-w-0">
 		{#each leftApplets as appletId (appletId)}

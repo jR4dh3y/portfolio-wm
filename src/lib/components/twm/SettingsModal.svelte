@@ -2,15 +2,19 @@
 	let {
 		errorMessage = '',
 		inputValue = '',
+		blurEnabled = false,
 		onClose,
 		onInput,
-		onSave
+		onSave,
+		onToggleBlur
 	}: {
 		errorMessage?: string;
 		inputValue?: string;
+		blurEnabled?: boolean;
 		onClose: () => void;
 		onInput: (value: string) => void;
 		onSave: () => void;
+		onToggleBlur: () => void;
 	} = $props();
 </script>
 
@@ -36,19 +40,47 @@
 		</div>
 
 		<div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-			<section class="border border-border bg-bg/40 p-5">
-				<div class="mb-4 font-bold text-accent">~/help</div>
-				<div class="grid grid-cols-[80px_1fr] gap-2 text-xs">
-					<span class="text-dim">[1]-[6]</span>
-					<span>Focus pane</span>
-					<span class="text-dim">[←][→]</span>
-					<span>Move across columns</span>
-					<span class="text-dim">[↑][↓]</span>
-					<span>Move stack / workspace</span>
-					<span class="text-dim">[?]</span>
-					<span>Toggle settings</span>
-				</div>
-			</section>
+			<div class="flex flex-col gap-6">
+				<section class="border border-border bg-bg/40 p-5">
+					<div class="mb-4 font-bold text-accent">~/help</div>
+					<div class="grid grid-cols-[80px_1fr] gap-2 text-xs">
+						<span class="text-dim">[1]-[6]</span>
+						<span>Focus pane</span>
+						<span class="text-dim">[←][→]</span>
+						<span>Move across columns</span>
+						<span class="text-dim">[↑][↓]</span>
+						<span>Move stack / workspace</span>
+						<span class="text-dim">[?]</span>
+						<span>Toggle settings</span>
+					</div>
+				</section>
+
+				<section class="border border-border bg-bg/40 p-5">
+					<div class="mb-4 font-bold text-accent">~/appearance</div>
+					<div class="flex items-center justify-between">
+						<div>
+							<p class="text-sm text-fg">Window blur</p>
+							<p class="mt-1 text-xs text-dim">Frosted glass effect on panes</p>
+						</div>
+						<button
+							type="button"
+							class="relative h-6 w-11 shrink-0 rounded-full border transition-colors {blurEnabled
+								? 'border-highlight bg-highlight/30'
+								: 'border-border bg-bg/70'}"
+							onclick={onToggleBlur}
+							role="switch"
+							aria-checked={blurEnabled}
+							aria-label="Toggle window blur"
+						>
+							<span
+								class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full transition-transform {blurEnabled
+									? 'translate-x-5 bg-highlight'
+									: 'translate-x-0 bg-dim'}"
+							></span>
+						</button>
+					</div>
+				</section>
+			</div>
 
 			<section class="border border-border bg-bg/40 p-5">
 				<div class="mb-4 font-bold text-accent">~/wallpaper</div>

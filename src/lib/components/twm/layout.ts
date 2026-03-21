@@ -256,28 +256,29 @@ export function getFirstPaneIdForWorkspace(workspaceId: WorkspaceId): PaneId | n
 }
 
 const paneNeighbors: Record<PaneId, Partial<Record<Direction, PaneId>>> = {
-	homelab: {
-		right: 'hero',
-		down: 'terminal'
-	},
-	terminal: {
-		right: 'hero',
-		up: 'homelab',
-		down: 'projects'
-	},
 	hero: {
-		left: 'terminal',
 		right: 'about',
 		down: 'projects'
 	},
 	about: {
 		left: 'hero',
+		right: 'homelab',
 		down: 'skills'
 	},
 	skills: {
 		left: 'hero',
+		right: 'terminal',
 		up: 'about',
 		down: 'experience'
+	},
+	homelab: {
+		left: 'about',
+		down: 'terminal'
+	},
+	terminal: {
+		left: 'skills',
+		up: 'homelab',
+		down: 'projects'
 	},
 	projects: {
 		up: 'hero',

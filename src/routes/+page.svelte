@@ -24,6 +24,7 @@
 		type WorkspaceMeta
 	} from '$lib/components/twm/layout';
 	import { createWallpaperState } from '$lib/stores/wallpaper';
+	import { createSettingsState } from '$lib/stores/settings';
 	import type { PageData } from './$types';
 
 	const desktopViewportId = 'workspace-viewport';
@@ -55,6 +56,8 @@
 	let time = $state(new Date().toLocaleTimeString());
 	let scrollSyncFrame = 0;
 	const wallpaperState = createWallpaperState(untrack(() => data.bundledWallpapers));
+	const settingsState = createSettingsState();
+	const blurEnabled = fromStore(settingsState.blurEnabled);
 	const activeWallpaper = fromStore(wallpaperState.activeWallpaper);
 	const wallpaperModalOpen = fromStore(wallpaperState.modalOpen);
 	const wallpaperDraftUrl = fromStore(wallpaperState.draftUrl);
@@ -354,7 +357,9 @@
 </svelte:head>
 
 <main
-	class="relative flex h-full w-full flex-col overflow-hidden bg-bg p-[var(--workspace-pane-gap)] font-mono text-fg antialiased md:h-screen md:max-h-screen"
+	class="relative flex h-full w-full flex-col overflow-hidden bg-bg p-[var(--workspace-pane-gap)] font-mono text-fg antialiased md:h-screen md:max-h-screen {blurEnabled.current
+		? 'blur-enabled'
+		: ''}"
 >
 	{#if activeWallpaper.current}
 		<div class="pointer-events-none absolute inset-0 hidden md:block">
@@ -372,9 +377,11 @@
 		<SettingsModal
 			errorMessage={wallpaperErrorMessage.current}
 			inputValue={wallpaperDraftUrl.current}
+			blurEnabled={blurEnabled.current}
 			onClose={wallpaperState.closeModal}
 			onInput={wallpaperState.updateDraftUrl}
 			onSave={wallpaperState.saveCustomWallpaper}
+			onToggleBlur={settingsState.toggleBlur}
 		/>
 	{/if}
 
