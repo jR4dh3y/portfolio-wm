@@ -211,3 +211,4 @@ const paneNeighbors: Record<PaneId, Partial<Record<Direction, PaneId>>> = {
 export function getNeighborPaneId(paneId: PaneId, direction: Direction): PaneId {
 	return paneNeighbors[paneId][direction] ?? paneId;
 }
+// 3rd workspace
