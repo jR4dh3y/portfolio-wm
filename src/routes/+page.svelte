@@ -6,10 +6,8 @@
 	import TwmPane from '$lib/components/twm/TwmPane.svelte';
 	import WallpaperModal from '$lib/components/twm/WallpaperModal.svelte';
 	import {
-		projectPaneFocusRequest,
-		returnToPane,
-		clearProjectPaneFocusRequest,
-		clearReturnToPane
+		projectNavigationRequest,
+		clearProjectNavigationRequest
 	} from '$lib/stores/project-navigation';
 	import {
 		bottomBarAppletPlacements,
@@ -39,7 +37,11 @@
 	const wallpaperModalOpen = fromStore(wallpaperState.modalOpen);
 	const wallpaperDraftUrl = fromStore(wallpaperState.draftUrl);
 	const wallpaperErrorMessage = fromStore(wallpaperState.errorMessage);
+	const projectNavigation = fromStore(projectNavigationRequest);
 	let activeWorkspaceId = $state<(typeof workspaces)[number]['id']>('workspace-1');
+	let selectedProjectSlug = $state<string | null>(null);
+	let projectSourcePane = $state<PaneId>('projects');
+	let lastHandledProjectNavigationNonce = $state<number | null>(null);
 
 	let activeWorkspace = $derived(getWorkspaceById(activeWorkspaceId));
 
@@ -280,25 +282,35 @@
 		focusWorkspace(workspaceId);
 	}
 
-	$effect(() => {
-		const focusRequest = $projectPaneFocusRequest;
-		if (!focusRequest || typeof document === 'undefined') {
-			return;
-		}
+	function openProjectDetail(slug: string, sourcePane: PaneId) {
+		selectedProjectSlug = slug;
+		projectSourcePane = sourcePane;
 
 		focusPane('projects');
-		clearProjectPaneFocusRequest();
-	});
+	}
+
+	function closeProjectDetail(sourcePane: PaneId) {
+		selectedProjectSlug = null;
+		projectSourcePane = 'projects';
+
+		if (sourcePane !== 'projects') {
+			focusPane(sourcePane);
+		}
+	}
 
 	$effect(() => {
-		const targetPane = $returnToPane;
-		if (!targetPane || typeof document === 'undefined') {
+		const request = projectNavigation.current;
+		if (
+			!request ||
+			typeof document === 'undefined' ||
+			request.nonce === lastHandledProjectNavigationNonce
+		) {
 			return;
 		}
 
-		clearProjectPaneFocusRequest();
-		focusPane(targetPane);
-		clearReturnToPane();
+		lastHandledProjectNavigationNonce = request.nonce;
+		openProjectDetail(request.slug, request.sourcePane ?? 'projects');
+		clearProjectNavigationRequest();
 	});
 
 	function toggleHelp() {
@@ -381,7 +393,16 @@
 					{activePaneId}
 					onFocus={handlePaneFocus}
 				>
-					<PaneComponent />
+					{#if pane.id === 'projects'}
+						<PaneComponent
+							{selectedProjectSlug}
+							sourcePane={projectSourcePane}
+							onOpenProject={openProjectDetail}
+							onCloseProject={closeProjectDetail}
+						/>
+					{:else}
+						<PaneComponent />
+					{/if}
 				</TwmPane>
 			{/each}
 		</div>
@@ -411,7 +432,16 @@
 											{activePaneId}
 											onFocus={handlePaneFocus}
 										>
-											<PaneComponent />
+											{#if pane.id === 'projects'}
+												<PaneComponent
+													{selectedProjectSlug}
+													sourcePane={projectSourcePane}
+													onOpenProject={openProjectDetail}
+													onCloseProject={closeProjectDetail}
+												/>
+											{:else}
+												<PaneComponent />
+											{/if}
 										</TwmPane>
 									{/each}
 								</div>

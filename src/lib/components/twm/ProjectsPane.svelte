@@ -2,25 +2,31 @@
 	import { projects } from '$lib/data';
 	import ProjectCard from '$lib/components/twm/projects/ProjectCard.svelte';
 	import ProjectDetailView from '$lib/components/twm/projects/ProjectDetailView.svelte';
-	import {
-		projectNavigationRequest,
-		projectDetailCloseRequest,
-		navigateBack,
-		clearProjectNavigationRequest,
-		clearProjectPaneFocusRequest,
-		requestProjectDetailClose
-	} from '$lib/stores/project-navigation';
 	import type { PaneId } from '$lib/components/twm/layout';
 
-	let selectedProjectIndex = $state<number | null>(null);
+	let {
+		selectedProjectSlug = null,
+		sourcePane = 'projects',
+		onOpenProject = () => {},
+		onCloseProject = () => {}
+	}: {
+		selectedProjectSlug?: string | null;
+		sourcePane?: PaneId;
+		onOpenProject?: (slug: string, sourcePane: PaneId) => void;
+		onCloseProject?: (sourcePane: PaneId) => void;
+	} = $props();
+
 	let lastFocusedCardId = $state('');
 	let projectsListContainer = $state<HTMLDivElement | null>(null);
 	let projectsListScrollTop = $state(0);
-	let sourcePane = $state<PaneId>('projects');
-	let lastHandledNavigationNonce = $state<number | null>(null);
 
 	let selectedProject = $derived(
-		selectedProjectIndex === null ? null : projects[selectedProjectIndex]
+		selectedProjectSlug
+			? (projects.find((project) => {
+					const projectSlug = project.slug ?? toProjectSlug(project.title);
+					return projectSlug === selectedProjectSlug;
+				}) ?? null)
+			: null
 	);
 
 	function toProjectSlug(value: string): string {
@@ -31,35 +37,19 @@
 			.replace(/(^-|-$)+/g, '');
 	}
 
-	function openProject(index: number, nextSourcePane: PaneId = 'projects') {
+	function openProject(index: number) {
 		projectsListScrollTop = projectsListContainer?.scrollTop ?? projectsListScrollTop;
 		lastFocusedCardId = `project-card-${index}`;
-		sourcePane = nextSourcePane;
-		selectedProjectIndex = index;
-	}
-
-	function resetProjectSelection() {
-		selectedProjectIndex = null;
-		lastFocusedCardId = '';
-		sourcePane = 'projects';
-	}
-
-	function openProjectFromProjects(index: number) {
-		clearProjectNavigationRequest();
-		clearProjectPaneFocusRequest();
-		openProject(index, 'projects');
+		onOpenProject(projects[index].slug ?? toProjectSlug(projects[index].title), 'projects');
 	}
 
 	function closeProject() {
 		const originSourcePane = sourcePane;
 		const focusedCardId = lastFocusedCardId;
-		resetProjectSelection();
-		requestProjectDetailClose();
+		onCloseProject(originSourcePane);
 
 		// If we came from another pane, navigate back to it
 		if (originSourcePane !== 'projects') {
-			clearProjectPaneFocusRequest();
-			navigateBack(originSourcePane);
 			return;
 		}
 
@@ -83,41 +73,13 @@
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
-		if (event.key !== 'Escape' || selectedProjectIndex === null) {
+		if (event.key !== 'Escape' || !selectedProject) {
 			return;
 		}
 
 		event.preventDefault();
 		closeProject();
 	}
-
-	$effect(() => {
-		const request = $projectNavigationRequest;
-		if (!request || request.nonce === lastHandledNavigationNonce) {
-			return;
-		}
-
-		const nextIndex = projects.findIndex((project) => {
-			const projectSlug = project.slug ?? toProjectSlug(project.title);
-			return projectSlug === request.slug;
-		});
-
-		if (nextIndex === -1) {
-			return;
-		}
-
-		lastHandledNavigationNonce = request.nonce;
-		openProject(nextIndex, request.sourcePane ?? 'projects');
-	});
-
-	$effect(() => {
-		const closeRequest = $projectDetailCloseRequest;
-		if (!closeRequest) {
-			return;
-		}
-
-		resetProjectSelection();
-	});
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -132,11 +94,7 @@
 	>
 		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 			{#each projects as project, index (project.title)}
-				<ProjectCard
-					{project}
-					cardId={`project-card-${index}`}
-					onOpen={() => openProjectFromProjects(index)}
-				/>
+				<ProjectCard {project} cardId={`project-card-${index}`} onOpen={() => openProject(index)} />
 			{/each}
 		</div>
 	</div>
