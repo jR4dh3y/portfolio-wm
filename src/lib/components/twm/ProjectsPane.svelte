@@ -17,6 +17,7 @@
 	let projectsListContainer = $state<HTMLDivElement | null>(null);
 	let projectsListScrollTop = $state(0);
 	let sourcePane = $state<PaneId>('projects');
+	let lastHandledNavigationNonce = $state<number | null>(null);
 
 	let selectedProject = $derived(
 		selectedProjectIndex === null ? null : projects[selectedProjectIndex]
@@ -37,6 +38,12 @@
 		selectedProjectIndex = index;
 	}
 
+	function resetProjectSelection() {
+		selectedProjectIndex = null;
+		lastFocusedCardId = '';
+		sourcePane = 'projects';
+	}
+
 	function openProjectFromProjects(index: number) {
 		clearProjectNavigationRequest();
 		clearProjectPaneFocusRequest();
@@ -46,9 +53,7 @@
 	function closeProject() {
 		const originSourcePane = sourcePane;
 		const focusedCardId = lastFocusedCardId;
-		selectedProjectIndex = null;
-		lastFocusedCardId = '';
-		sourcePane = 'projects';
+		resetProjectSelection();
 		requestProjectDetailClose();
 
 		// If we came from another pane, navigate back to it
@@ -88,7 +93,7 @@
 
 	$effect(() => {
 		const request = $projectNavigationRequest;
-		if (!request) {
+		if (!request || request.nonce === lastHandledNavigationNonce) {
 			return;
 		}
 
@@ -101,6 +106,7 @@
 			return;
 		}
 
+		lastHandledNavigationNonce = request.nonce;
 		openProject(nextIndex, request.sourcePane ?? 'projects');
 	});
 
@@ -110,9 +116,7 @@
 			return;
 		}
 
-		selectedProjectIndex = null;
-		lastFocusedCardId = '';
-		sourcePane = 'projects';
+		resetProjectSelection();
 	});
 </script>
 
