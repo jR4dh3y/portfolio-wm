@@ -104,7 +104,7 @@
 		const column = pane?.closest<HTMLElement>('[data-column-id]');
 
 		workspace?.scrollIntoView({ behavior, block: 'center', inline: 'nearest' });
-		column?.scrollIntoView({ behavior, block: 'nearest', inline: 'center' });
+		column?.scrollIntoView({ behavior, block: 'nearest', inline: 'nearest' });
 		pane?.scrollIntoView({ behavior, block: 'nearest', inline: 'nearest' });
 
 		if (shouldFocus) {

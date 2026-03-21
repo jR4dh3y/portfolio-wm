@@ -172,7 +172,7 @@
 
 		.workspace-rail > .workspace-column {
 			flex: 0 0 auto;
-			scroll-snap-align: center;
+			scroll-snap-align: start;
 			scroll-snap-stop: always;
 		}
 
@@ -232,5 +232,11 @@
 
 	.clip-text-reveal {
 		clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+	}
+
+	.w-pane-half {
+		width: calc(50% - calc(var(--workspace-pane-gap) / 2));
+		min-width: calc(50% - calc(var(--workspace-pane-gap) / 2));
+		max-width: calc(50% - calc(var(--workspace-pane-gap) / 2));
 	}
 }

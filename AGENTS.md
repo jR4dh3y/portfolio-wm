@@ -45,3 +45,13 @@
 2. **Use nonces for deduplication.**
    - When firing one-off events via stores, attach a `nonce` or unique ID to the event payload.
    - Let each component track its `lastProcessedNonce` locally to avoid running the same event twice, rather than clearing the global store.
+
+## TWM Layout & Split-Pane CSS
+
+1. **Accounting for Gaps in Split Panes:**
+   - When placing percentage-width columns (e.g., 50%) inside a flex container with a `gap`, the combined width exceeds 100%, causing horizontal overflow.
+   - Use `.w-pane-half` (`calc(50% - calc(var(--workspace-pane-gap) / 2))`) instead of `w-[50%]` to keep split panes perfectly flush within the viewport.
+2. **Preventing Unwanted Panning (Left/Right Movement):**
+   - When using `scrollIntoView()` on a pane in a split layout, use `inline: 'nearest'` rather than `inline: 'center'`. This stops the browser from forcefully centering a column that is already fully visible.
+3. **Scroll Snapping:**
+   - Use `scroll-snap-align: start` for workspace columns so horizontal scrolling snaps perfectly to paired panes (like Hero & About side-by-side) instead of awkwardly centering a single column.

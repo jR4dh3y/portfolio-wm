@@ -136,18 +136,17 @@ export const workspaces: WorkspaceMeta[] = [
 		columns: [
 			{
 				id: 'hero-column',
-				className: 'w-[50%] min-w-[50%] max-w-[50%]',
+				className: 'w-pane-half',
 				panes: [panes.hero]
 			},
 			{
 				id: 'info-column',
-				className: 'workspace-column-stack w-[50%] min-w-[50%] max-w-[50%]',
+				className: 'workspace-column-stack w-pane-half',
 				panes: [panes.about, panes.skills]
 			},
 			{
 				id: 'homelab-column',
-				className:
-					'workspace-column-stack workspace-column-stack-homelab w-[50%] min-w-[50%] max-w-[50%]',
+				className: 'workspace-column-stack workspace-column-stack-homelab w-pane-half',
 				panes: [panes.homelab, panes.terminal]
 			}
 		]
@@ -159,12 +158,12 @@ export const workspaces: WorkspaceMeta[] = [
 		columns: [
 			{
 				id: 'projects-column',
-				className: 'w-[50%] min-w-[50%] max-w-[50%]',
+				className: 'w-pane-half',
 				panes: [panes.projects]
 			},
 			{
 				id: 'details-column',
-				className: 'flex-col w-[50%] min-w-[50%] max-w-[50%]',
+				className: 'flex-col w-pane-half',
 				children: [
 					{
 						id: 'experience-row',
