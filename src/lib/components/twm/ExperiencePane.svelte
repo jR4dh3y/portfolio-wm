@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { StepBack } from 'lucide-svelte';
 	import { experience } from '$lib/data';
 </script>
 
@@ -22,9 +23,10 @@
 									href={link.href}
 									target="_blank"
 									rel="noopener noreferrer"
-									class="border-b border-dim pb-0.5 font-mono text-[10px] text-dim transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
+									class="inline-flex items-center gap-1 border-b border-dim pb-0.5 font-mono text-[10px] text-dim transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 								>
-									{link.label} ↗
+									{link.label}
+									<StepBack class="h-3 w-3 rotate-180" aria-hidden="true" />
 								</a>
 							{/each}
 						</div>

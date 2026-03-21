@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Download, Github, Linkedin, Mail, X } from 'lucide-svelte';
 	import { profile, socialLinks } from '$lib/data';
 </script>
 
@@ -36,15 +37,15 @@
 					class="flex items-center gap-2 border border-border bg-surface px-4 py-2 transition-colors hover:bg-highlight hover:text-surface"
 				>
 					{#if link.icon === 'Github'}
-						<span aria-hidden="true">GH</span>
+						<Github class="h-4 w-4" aria-hidden="true" />
 					{:else if link.icon === 'Linkedin'}
-						<span aria-hidden="true">IN</span>
+						<Linkedin class="h-4 w-4" aria-hidden="true" />
 					{:else if link.icon === 'Mail'}
-						<span aria-hidden="true">@</span>
+						<Mail class="h-4 w-4" aria-hidden="true" />
 					{:else if link.icon === 'XIcon'}
-						<span aria-hidden="true">X</span>
+						<X class="h-4 w-4" aria-hidden="true" />
 					{:else}
-						<span aria-hidden="true">DL</span>
+						<Download class="h-4 w-4" aria-hidden="true" />
 					{/if}
 					<span class="hidden sm:inline">{link.label}</span>
 				</a>

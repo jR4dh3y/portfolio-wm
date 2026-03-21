@@ -4,8 +4,11 @@
 	import ProjectDetailView from '$lib/components/twm/projects/ProjectDetailView.svelte';
 	import {
 		projectNavigationRequest,
+		projectDetailCloseRequest,
 		navigateBack,
-		clearProjectPaneFocusRequest
+		clearProjectNavigationRequest,
+		clearProjectPaneFocusRequest,
+		requestProjectDetailClose
 	} from '$lib/stores/project-navigation';
 	import type { PaneId } from '$lib/components/twm/layout';
 
@@ -34,12 +37,19 @@
 		selectedProjectIndex = index;
 	}
 
+	function openProjectFromProjects(index: number) {
+		clearProjectNavigationRequest();
+		clearProjectPaneFocusRequest();
+		openProject(index, 'projects');
+	}
+
 	function closeProject() {
 		const originSourcePane = sourcePane;
 		const focusedCardId = lastFocusedCardId;
 		selectedProjectIndex = null;
 		lastFocusedCardId = '';
 		sourcePane = 'projects';
+		requestProjectDetailClose();
 
 		// If we came from another pane, navigate back to it
 		if (originSourcePane !== 'projects') {
@@ -93,6 +103,17 @@
 
 		openProject(nextIndex, request.sourcePane ?? 'projects');
 	});
+
+	$effect(() => {
+		const closeRequest = $projectDetailCloseRequest;
+		if (!closeRequest) {
+			return;
+		}
+
+		selectedProjectIndex = null;
+		lastFocusedCardId = '';
+		sourcePane = 'projects';
+	});
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
@@ -110,7 +131,7 @@
 				<ProjectCard
 					{project}
 					cardId={`project-card-${index}`}
-					onOpen={() => openProject(index, 'projects')}
+					onOpen={() => openProjectFromProjects(index)}
 				/>
 			{/each}
 		</div>

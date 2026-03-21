@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ArrowUpRight, Github } from 'lucide-svelte';
 	import type { Project } from '$lib/data';
 
 	let {
@@ -13,7 +14,7 @@
 </script>
 
 <article
-	class="group relative flex min-h-[18rem] w-full flex-col justify-end overflow-hidden border border-border bg-surface transition-colors hover:border-highlight sm:aspect-[4/3]"
+	class="group relative flex min-h-72 w-full flex-col justify-end overflow-hidden border border-border bg-surface transition-colors hover:border-highlight sm:aspect-[4/3]"
 >
 	<button
 		type="button"
@@ -44,7 +45,7 @@
 			aria-label={`Open ${project.title} source code`}
 			class="border border-border bg-surface p-2 text-dim transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 		>
-			<span aria-hidden="true" class="text-[10px] font-bold uppercase">GH</span>
+			<Github class="h-4 w-4" aria-hidden="true" />
 		</a>
 		{#if project.liveUrl}
 			<a
@@ -54,7 +55,7 @@
 				aria-label={`Open ${project.title} live site`}
 				class="border border-border bg-surface p-2 text-dim transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 			>
-				<span aria-hidden="true" class="text-[10px] font-bold uppercase">GO</span>
+				<ArrowUpRight class="h-4 w-4" aria-hidden="true" />
 			</a>
 		{/if}
 	</div>
