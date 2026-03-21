@@ -6,8 +6,16 @@ import HeroPane from '$lib/components/twm/HeroPane.svelte';
 import HomelabPane from '$lib/components/twm/HomelabPane.svelte';
 import ProjectsPane from '$lib/components/twm/ProjectsPane.svelte';
 import SkillsPane from '$lib/components/twm/SkillsPane.svelte';
+import TerminalPane from '$lib/components/twm/TerminalPane.svelte';
 
-export type PaneId = 'homelab' | 'hero' | 'about' | 'skills' | 'projects' | 'experience';
+export type PaneId =
+	| 'homelab'
+	| 'terminal'
+	| 'hero'
+	| 'about'
+	| 'skills'
+	| 'projects'
+	| 'experience';
 export type WorkspaceId = 'workspace-1' | 'workspace-2' | 'workspace-3';
 export type Direction = 'left' | 'right' | 'up' | 'down';
 
@@ -55,7 +63,14 @@ export const panes: Record<PaneId, PaneMeta> = {
 		title: 'homelab.sh',
 		shortcut: '1',
 		component: HomelabPane,
-		className: 'h-full'
+		className: 'h-full min-h-0'
+	},
+	terminal: {
+		id: 'terminal',
+		title: 'terminal',
+		shortcut: '',
+		component: TerminalPane,
+		className: 'h-full min-h-0'
 	},
 	hero: {
 		id: 'hero',
@@ -112,8 +127,9 @@ export const workspaces: WorkspaceMeta[] = [
 			},
 			{
 				id: 'homelab-column',
-				className: 'w-[50%] min-w-[50%] max-w-[50%]',
-				panes: [panes.homelab]
+				className:
+					'workspace-column-stack workspace-column-stack-homelab w-[50%] min-w-[50%] max-w-[50%]',
+				panes: [panes.homelab, panes.terminal]
 			}
 		]
 	},
@@ -157,6 +173,7 @@ export const mobilePaneOrder: PaneMeta[] = [
 	panes.hero,
 	panes.projects,
 	panes.homelab,
+	panes.terminal,
 	panes.experience,
 	panes.about,
 	panes.skills
@@ -190,10 +207,15 @@ export function getFirstPaneIdForWorkspace(workspaceId: WorkspaceId): PaneId | n
 const paneNeighbors: Record<PaneId, Partial<Record<Direction, PaneId>>> = {
 	homelab: {
 		right: 'hero',
+		down: 'terminal'
+	},
+	terminal: {
+		right: 'hero',
+		up: 'homelab',
 		down: 'projects'
 	},
 	hero: {
-		left: 'homelab',
+		left: 'terminal',
 		right: 'about',
 		down: 'projects'
 	},
