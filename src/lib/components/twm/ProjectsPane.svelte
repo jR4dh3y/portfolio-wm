@@ -6,7 +6,6 @@
 		projectNavigationRequest,
 		projectDetailCloseRequest,
 		navigateBack,
-		clearProjectNavigationRequest,
 		clearProjectPaneFocusRequest,
 		requestProjectDetailClose
 	} from '$lib/stores/project-navigation';
@@ -38,7 +37,6 @@
 	}
 
 	function openProjectFromProjects(index: number) {
-		clearProjectNavigationRequest();
 		clearProjectPaneFocusRequest();
 		openProject(index, 'projects');
 	}
@@ -86,11 +84,16 @@
 		closeProject();
 	}
 
+	let lastProcessedNavigationNonce = 0;
+	let lastProcessedCloseNonce = 0;
+
 	$effect(() => {
 		const request = $projectNavigationRequest;
-		if (!request) {
+		if (!request || request.nonce === lastProcessedNavigationNonce) {
 			return;
 		}
+
+		lastProcessedNavigationNonce = request.nonce;
 
 		const nextIndex = projects.findIndex((project) => {
 			const projectSlug = project.slug ?? toProjectSlug(project.title);
@@ -106,10 +109,11 @@
 
 	$effect(() => {
 		const closeRequest = $projectDetailCloseRequest;
-		if (!closeRequest) {
+		if (!closeRequest || closeRequest === lastProcessedCloseNonce) {
 			return;
 		}
 
+		lastProcessedCloseNonce = closeRequest;
 		selectedProjectIndex = null;
 		lastFocusedCardId = '';
 		sourcePane = 'projects';

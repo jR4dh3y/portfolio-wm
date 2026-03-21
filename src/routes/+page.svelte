@@ -6,8 +6,10 @@
 	import SettingsModal from '$lib/components/twm/SettingsModal.svelte';
 	import TwmPane from '$lib/components/twm/TwmPane.svelte';
 	import {
-		projectNavigationRequest,
-		clearProjectNavigationRequest
+		projectPaneFocusRequest,
+		clearProjectPaneFocusRequest,
+		returnToPane,
+		clearReturnToPane
 	} from '$lib/stores/project-navigation';
 	import {
 		bottomBarAppletPlacements,
@@ -63,10 +65,6 @@
 	const wallpaperDraftUrl = fromStore(wallpaperState.draftUrl);
 	const wallpaperErrorMessage = fromStore(wallpaperState.errorMessage);
 	let activeWorkspaceId = $state<(typeof workspaceLayout)[number]['id']>('workspace-1');
-	let selectedProjectSlug = $state<string | null>(null);
-	let projectSourcePane = $state<PaneId>('projects');
-	let lastHandledProjectNavigationNonce = $state<number | null>(null);
-
 	let activeWorkspace = $derived(getWorkspaceById(activeWorkspaceId));
 
 	function isDesktopViewport(): boolean {
@@ -287,18 +285,22 @@
 	}
 
 	onMount(() => {
-		const unsubscribeProjectNavigation = projectNavigationRequest.subscribe((request) => {
-			if (
-				!request ||
-				typeof document === 'undefined' ||
-				request.nonce === lastHandledProjectNavigationNonce
-			) {
+		const unsubscribeProjectPaneFocus = projectPaneFocusRequest.subscribe((nonce) => {
+			if (!nonce || typeof document === 'undefined') {
 				return;
 			}
 
-			lastHandledProjectNavigationNonce = request.nonce;
-			openProjectDetail(request.slug, request.sourcePane ?? 'projects');
-			clearProjectNavigationRequest();
+			clearProjectPaneFocusRequest();
+			focusPane('projects');
+		});
+
+		const unsubscribeReturnToPane = returnToPane.subscribe((targetPane) => {
+			if (!targetPane) {
+				return;
+			}
+
+			clearReturnToPane();
+			focusPane(targetPane);
 		});
 
 		const interval = setInterval(() => {
@@ -311,7 +313,8 @@
 		}
 
 		return () => {
-			unsubscribeProjectNavigation();
+			unsubscribeProjectPaneFocus();
+			unsubscribeReturnToPane();
 			clearInterval(interval);
 			cancelAnimationFrame(scrollSyncFrame);
 		};
@@ -323,22 +326,6 @@
 
 	function handleWorkspaceAppletClick(workspaceId: (typeof workspaceLayout)[number]['id']) {
 		focusWorkspace(workspaceId);
-	}
-
-	function openProjectDetail(slug: string, sourcePane: PaneId) {
-		selectedProjectSlug = slug;
-		projectSourcePane = sourcePane;
-
-		focusPane('projects');
-	}
-
-	function closeProjectDetail(sourcePane: PaneId) {
-		selectedProjectSlug = null;
-		projectSourcePane = 'projects';
-
-		if (sourcePane !== 'projects') {
-			focusPane(sourcePane);
-		}
 	}
 
 	function handleOpenSettings() {
@@ -399,16 +386,7 @@
 					{activePaneId}
 					onFocus={handlePaneFocus}
 				>
-					{#if pane.id === 'projects'}
-						<PaneComponent
-							{selectedProjectSlug}
-							sourcePane={projectSourcePane}
-							onOpenProject={openProjectDetail}
-							onCloseProject={closeProjectDetail}
-						/>
-					{:else}
-						<PaneComponent />
-					{/if}
+					<PaneComponent />
 				</TwmPane>
 			{/each}
 		</div>
@@ -467,16 +445,7 @@
 															{activePaneId}
 															onFocus={handlePaneFocus}
 														>
-															{#if pane.id === 'projects'}
-																<PaneComponent
-																	{selectedProjectSlug}
-																	sourcePane={projectSourcePane}
-																	onOpenProject={openProjectDetail}
-																	onCloseProject={closeProjectDetail}
-																/>
-															{:else}
-																<PaneComponent />
-															{/if}
+															<PaneComponent />
 														</TwmPane>
 													{/each}
 												{/if}
@@ -494,16 +463,7 @@
 												{activePaneId}
 												onFocus={handlePaneFocus}
 											>
-												{#if pane.id === 'projects'}
-													<PaneComponent
-														{selectedProjectSlug}
-														sourcePane={projectSourcePane}
-														onOpenProject={openProjectDetail}
-														onCloseProject={closeProjectDetail}
-													/>
-												{:else}
-													<PaneComponent />
-												{/if}
+												<PaneComponent />
 											</TwmPane>
 										{/each}
 									{/if}

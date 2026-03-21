@@ -36,3 +36,12 @@
 5. **Is this function doing too much?**
    - Can you describe it in one sentence without "and"?
    - If not, break it down
+
+## Svelte 5 & Global Stores State Management
+
+1. **Never clear global stores from within component `$effect` blocks.**
+   - In responsive layouts (e.g., separate mobile and desktop DOM trees), a component might be rendered multiple times simultaneously.
+   - If one instance clears a global store (like a navigation request) after processing it, the other instance will miss the update and fail to trigger its effect.
+2. **Use nonces for deduplication.**
+   - When firing one-off events via stores, attach a `nonce` or unique ID to the event payload.
+   - Let each component track its `lastProcessedNonce` locally to avoid running the same event twice, rather than clearing the global store.
