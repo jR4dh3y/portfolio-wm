@@ -1,6 +1,6 @@
 import type { WallpaperSource } from '$lib/stores/wallpaper';
 
-const bundledFiles = ['lucy.jpeg', 'max.png', 'ryo.png', 'wall.png'] as const;
+const bundledFiles = ['lucy.jpeg', 'max.png', 'wal.jpg'] as const;
 
 function toWallpaperLabel(filename: string): string {
 	return filename
