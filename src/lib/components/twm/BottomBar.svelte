@@ -26,7 +26,7 @@
 		name: string;
 		lastName: string;
 		role: string;
-		activePaneId: PaneId;
+		activePaneId: PaneId | 'none';
 		time: string;
 		workspaces: WorkspaceMeta[];
 		appletPlacements: BottomBarAppletPlacement[];

@@ -118,7 +118,7 @@
 		if (!isDesktopViewport()) {
 			const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
 			if (firstPaneId) {
-				focusPane(firstPaneId);
+				focusPane(firstPaneId, false);
 			}
 
 			return;
@@ -133,7 +133,7 @@
 
 		const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
 		if (firstPaneId) {
-			focusPane(firstPaneId);
+			focusPane(firstPaneId, false);
 		}
 	}
 
@@ -335,9 +335,33 @@
 	function handleWallpaperError() {
 		wallpaperState.fallbackFromFailedWallpaper();
 	}
+
+	let isPaneFocused = $state(false);
+
+	function handleFocusIn(event: FocusEvent) {
+		const target = event.target as HTMLElement | null;
+		if (target && typeof target.closest === 'function' && target.closest('.pane')) {
+			isPaneFocused = true;
+		}
+	}
+
+	function handleFocusOut(event: FocusEvent) {
+		const relatedTarget = event.relatedTarget as HTMLElement | null;
+		if (
+			!relatedTarget ||
+			(typeof relatedTarget.closest === 'function' && !relatedTarget.closest('.pane'))
+		) {
+			isPaneFocused = false;
+		}
+	}
 </script>
 
-<svelte:window onkeydown={handleKey} />
+<svelte:window
+	onkeydown={handleKey}
+	onfocusin={handleFocusIn}
+	onfocusout={handleFocusOut}
+	onblur={() => (isPaneFocused = false)}
+/>
 
 <svelte:head>
 	<title>Portfolio | {profile.name} {profile.lastName}</title>
@@ -481,7 +505,7 @@
 		lastName={profile.lastName}
 		onSelectWorkspace={handleWorkspaceAppletClick}
 		activeWorkspaceId={activeWorkspace.id}
-		{activePaneId}
+		activePaneId={isPaneFocused ? activePaneId : 'none'}
 		appletPlacements={bottomBarAppletPlacements}
 		{workspaces}
 		{time}
