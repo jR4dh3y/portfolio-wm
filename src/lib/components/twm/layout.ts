@@ -66,63 +66,63 @@ export const panes: Record<PaneId, PaneMeta> = {
 	homelab: {
 		id: 'homelab',
 		title: 'homelab.sh',
-		shortcut: '1',
+		shortcut: '4',
 		component: HomelabPane,
 		className: 'h-full min-h-0'
 	},
 	terminal: {
 		id: 'terminal',
 		title: 'terminal',
-		shortcut: '',
+		shortcut: '5',
 		component: TerminalPane,
 		className: 'h-full min-h-0'
 	},
 	hero: {
 		id: 'hero',
 		title: 'profile.svelte',
-		shortcut: '2',
+		shortcut: '1',
 		component: HeroPane,
 		className: 'h-full'
 	},
 	about: {
 		id: 'about',
 		title: 'about.txt',
-		shortcut: '3',
+		shortcut: '2',
 		component: AboutPane,
 		className: 'h-full min-h-0'
 	},
 	skills: {
 		id: 'skills',
 		title: 'skills.py',
-		shortcut: '4',
+		shortcut: '3',
 		component: SkillsPane,
 		className: 'h-full min-h-0'
 	},
 	projects: {
 		id: 'projects',
 		title: 'projects.dir',
-		shortcut: '5',
+		shortcut: '6',
 		component: ProjectsPane,
 		className: 'h-full'
 	},
 	experience: {
 		id: 'experience',
 		title: 'experience.md',
-		shortcut: '6',
+		shortcut: '7',
 		component: ExperiencePane,
 		className: 'h-full'
 	},
 	certifications: {
 		id: 'certifications',
 		title: 'certifications.log',
-		shortcut: '7',
+		shortcut: '8',
 		component: CertificationsPane,
 		className: 'h-full min-h-0'
 	},
 	spotify: {
 		id: 'spotify',
 		title: 'spotify.embed',
-		shortcut: '8',
+		shortcut: '9',
 		component: SpotifyPane,
 		className: 'h-full min-h-0'
 	}

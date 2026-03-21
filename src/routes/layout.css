@@ -182,7 +182,7 @@
 		}
 
 		.workspace-column-stack-homelab {
-			grid-template-rows: minmax(0, 1fr) minmax(0, 2fr);
+			grid-template-rows: minmax(0, 43.33fr) minmax(0, 56.67fr);
 		}
 
 		.workspace-column-stack.workspace-column {

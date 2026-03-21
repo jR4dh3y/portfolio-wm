@@ -338,6 +338,19 @@
 
 	let isPaneFocused = $state(false);
 
+	$effect(() => {
+		if (activeWorkspaceId && typeof document !== 'undefined') {
+			const activeEl = document.activeElement as HTMLElement | null;
+			const paneEl = activeEl?.closest('.pane') as HTMLElement | null;
+			if (paneEl) {
+				const paneId = paneEl.dataset.paneId as PaneId | undefined;
+				if (paneId && getWorkspaceIdForPane(paneId) !== activeWorkspaceId) {
+					activeEl?.blur();
+				}
+			}
+		}
+	});
+
 	function handleFocusIn(event: FocusEvent) {
 		const target = event.target as HTMLElement | null;
 		if (target && typeof target.closest === 'function' && target.closest('.pane')) {
