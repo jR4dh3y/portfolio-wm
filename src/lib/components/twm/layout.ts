@@ -46,7 +46,7 @@ export type BottomBarAppletId =
 	| 'active-pane'
 	| 'workspaces'
 	| 'wallpaper'
-	| 'help'
+	| 'settings'
 	| 'time';
 
 export type BottomBarZone = 'left' | 'right';
@@ -163,8 +163,8 @@ export const bottomBarAppletPlacements: BottomBarAppletPlacement[] = [
 	{ id: 'identity', zone: 'left', order: 1 },
 	{ id: 'workspaces', zone: 'left', order: 2 },
 	{ id: 'active-pane', zone: 'left', order: 3 },
-	{ id: 'help', zone: 'right', order: 1 },
-	{ id: 'wallpaper', zone: 'right', order: 2 },
+	{ id: 'wallpaper', zone: 'right', order: 1 },
+	{ id: 'settings', zone: 'right', order: 2 },
 	{ id: 'role', zone: 'right', order: 3 },
 	{ id: 'time', zone: 'right', order: 4 }
 ];

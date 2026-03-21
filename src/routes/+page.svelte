@@ -3,8 +3,8 @@
 	import { onMount, untrack } from 'svelte';
 	import { profile } from '$lib/data';
 	import BottomBar from '$lib/components/twm/BottomBar.svelte';
+	import SettingsModal from '$lib/components/twm/SettingsModal.svelte';
 	import TwmPane from '$lib/components/twm/TwmPane.svelte';
-	import WallpaperModal from '$lib/components/twm/WallpaperModal.svelte';
 	import {
 		projectNavigationRequest,
 		clearProjectNavigationRequest
@@ -30,14 +30,12 @@
 
 	let activePaneId = $state<PaneId>('hero');
 	let time = $state(new Date().toLocaleTimeString());
-	let showHelp = $state(false);
 	let scrollSyncFrame = 0;
 	const wallpaperState = createWallpaperState(untrack(() => data.bundledWallpapers));
 	const activeWallpaper = fromStore(wallpaperState.activeWallpaper);
 	const wallpaperModalOpen = fromStore(wallpaperState.modalOpen);
 	const wallpaperDraftUrl = fromStore(wallpaperState.draftUrl);
 	const wallpaperErrorMessage = fromStore(wallpaperState.errorMessage);
-	const projectNavigation = fromStore(projectNavigationRequest);
 	let activeWorkspaceId = $state<(typeof workspaces)[number]['id']>('workspace-1');
 	let selectedProjectSlug = $state<string | null>(null);
 	let projectSourcePane = $state<PaneId>('projects');
@@ -231,7 +229,11 @@
 
 		if (event.key === '?') {
 			event.preventDefault();
-			showHelp = !showHelp;
+			if (wallpaperModalOpen.current) {
+				wallpaperState.closeModal();
+			} else {
+				wallpaperState.openModal();
+			}
 			return;
 		}
 
@@ -259,6 +261,20 @@
 	}
 
 	onMount(() => {
+		const unsubscribeProjectNavigation = projectNavigationRequest.subscribe((request) => {
+			if (
+				!request ||
+				typeof document === 'undefined' ||
+				request.nonce === lastHandledProjectNavigationNonce
+			) {
+				return;
+			}
+
+			lastHandledProjectNavigationNonce = request.nonce;
+			openProjectDetail(request.slug, request.sourcePane ?? 'projects');
+			clearProjectNavigationRequest();
+		});
+
 		const interval = setInterval(() => {
 			time = new Date().toLocaleTimeString();
 		}, 1000);
@@ -269,6 +285,7 @@
 		}
 
 		return () => {
+			unsubscribeProjectNavigation();
 			clearInterval(interval);
 			cancelAnimationFrame(scrollSyncFrame);
 		};
@@ -298,27 +315,7 @@
 		}
 	}
 
-	$effect(() => {
-		const request = projectNavigation.current;
-		if (
-			!request ||
-			typeof document === 'undefined' ||
-			request.nonce === lastHandledProjectNavigationNonce
-		) {
-			return;
-		}
-
-		lastHandledProjectNavigationNonce = request.nonce;
-		openProjectDetail(request.slug, request.sourcePane ?? 'projects');
-		clearProjectNavigationRequest();
-	});
-
-	function toggleHelp() {
-		showHelp = !showHelp;
-	}
-
-	function handleOpenWallpaperModal() {
-		showHelp = false;
+	function handleOpenSettings() {
 		wallpaperState.openModal();
 	}
 
@@ -348,29 +345,8 @@
 		</div>
 	{/if}
 
-	{#if showHelp}
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-bg/90 p-4 backdrop-blur-sm">
-			<div class="border border-border bg-surface p-6">
-				<div class="mb-4 font-bold text-accent">~/help</div>
-				<div class="grid grid-cols-[80px_1fr] gap-2 text-xs">
-					<span class="text-dim">[1]-[6]</span> <span>Focus pane</span>
-					<span class="text-dim">[←][→]</span> <span>Move across columns</span>
-					<span class="text-dim">[↑][↓]</span> <span>Move stack / workspace</span>
-					<span class="text-dim">[?]</span> <span>Toggle this help</span>
-				</div>
-				<button
-					type="button"
-					class="mt-6 border border-dim px-4 py-1 text-xs hover:border-highlight hover:bg-highlight hover:text-black"
-					onclick={() => (showHelp = false)}
-				>
-					Close
-				</button>
-			</div>
-		</div>
-	{/if}
-
 	{#if wallpaperModalOpen.current}
-		<WallpaperModal
+		<SettingsModal
 			errorMessage={wallpaperErrorMessage.current}
 			inputValue={wallpaperDraftUrl.current}
 			onClose={wallpaperState.closeModal}
@@ -463,9 +439,7 @@
 		{workspaces}
 		{time}
 		role={profile.role}
-		activeWallpaperLabel={activeWallpaper.current?.label ?? 'wallpaper'}
 		onCycleWallpaper={wallpaperState.cycleWallpaper}
-		onOpenWallpaperModal={handleOpenWallpaperModal}
-		onToggleHelp={toggleHelp}
+		onOpenSettings={handleOpenSettings}
 	/>
 </main>
