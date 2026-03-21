@@ -4,8 +4,11 @@
 	import ProjectDetailView from '$lib/components/twm/projects/ProjectDetailView.svelte';
 	import {
 		projectNavigationRequest,
+		projectDetailCloseRequest,
 		navigateBack,
-		clearProjectNavigationRequest
+		clearProjectNavigationRequest,
+		clearProjectPaneFocusRequest,
+		requestProjectDetailClose
 	} from '$lib/stores/project-navigation';
 	import type { PaneId } from '$lib/components/twm/layout';
 
@@ -27,10 +30,17 @@
 			.replace(/(^-|-$)+/g, '');
 	}
 
-	function openProject(index: number) {
+	function openProject(index: number, nextSourcePane: PaneId = 'projects') {
 		projectsListScrollTop = projectsListContainer?.scrollTop ?? projectsListScrollTop;
 		lastFocusedCardId = `project-card-${index}`;
+		sourcePane = nextSourcePane;
 		selectedProjectIndex = index;
+	}
+
+	function openProjectFromProjects(index: number) {
+		clearProjectNavigationRequest();
+		clearProjectPaneFocusRequest();
+		openProject(index, 'projects');
 	}
 
 	function closeProject() {
@@ -39,10 +49,11 @@
 		selectedProjectIndex = null;
 		lastFocusedCardId = '';
 		sourcePane = 'projects';
+		requestProjectDetailClose();
 
 		// If we came from another pane, navigate back to it
 		if (originSourcePane !== 'projects') {
-			clearProjectNavigationRequest();
+			clearProjectPaneFocusRequest();
 			navigateBack(originSourcePane);
 			return;
 		}
@@ -87,13 +98,21 @@
 		});
 
 		if (nextIndex === -1) {
-			clearProjectNavigationRequest();
 			return;
 		}
 
-		sourcePane = request.sourcePane ?? 'projects';
-		openProject(nextIndex);
-		clearProjectNavigationRequest();
+		openProject(nextIndex, request.sourcePane ?? 'projects');
+	});
+
+	$effect(() => {
+		const closeRequest = $projectDetailCloseRequest;
+		if (!closeRequest) {
+			return;
+		}
+
+		selectedProjectIndex = null;
+		lastFocusedCardId = '';
+		sourcePane = 'projects';
 	});
 </script>
 
@@ -103,13 +122,17 @@
 	<ProjectDetailView project={selectedProject} onBack={closeProject} />
 {:else}
 	<div
-		class="h-full w-full overflow-y-auto p-4 sm:p-8"
+		class="no-scrollbar h-full w-full overflow-y-auto p-4 sm:p-8"
 		bind:this={projectsListContainer}
 		onscroll={handleProjectsListScroll}
 	>
 		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
 			{#each projects as project, index (project.title)}
-				<ProjectCard {project} cardId={`project-card-${index}`} onOpen={() => openProject(index)} />
+				<ProjectCard
+					{project}
+					cardId={`project-card-${index}`}
+					onOpen={() => openProjectFromProjects(index)}
+				/>
 			{/each}
 		</div>
 	</div>

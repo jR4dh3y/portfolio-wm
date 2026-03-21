@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { fromStore } from 'svelte/store';
+	import { onMount, untrack } from 'svelte';
 	import { profile } from '$lib/data';
 	import BottomBar from '$lib/components/twm/BottomBar.svelte';
+	import SettingsModal from '$lib/components/twm/SettingsModal.svelte';
 	import TwmPane from '$lib/components/twm/TwmPane.svelte';
 	import {
 		projectNavigationRequest,
-		returnToPane,
-		clearReturnToPane
+		clearProjectNavigationRequest
 	} from '$lib/stores/project-navigation';
 	import {
 		bottomBarAppletPlacements,
@@ -18,17 +19,52 @@
 		shortcutToPaneId,
 		workspaces,
 		type Direction,
-		type PaneId
+		type PaneMeta,
+		type PaneId,
+		type WorkspaceMeta
 	} from '$lib/components/twm/layout';
+	import { createWallpaperState } from '$lib/stores/wallpaper';
+	import type { PageData } from './$types';
 
 	const desktopViewportId = 'workspace-viewport';
 
+	type WorkspaceLayoutColumn = {
+		id: string;
+		className: string;
+		panes?: PaneMeta[];
+		children?: WorkspaceLayoutColumn[];
+	};
+
+	type WorkspaceLayoutMeta = Omit<WorkspaceMeta, 'columns'> & {
+		columns: WorkspaceLayoutColumn[];
+	};
+
+	const workspaceLayout = workspaces as WorkspaceLayoutMeta[];
+
+	function getColumnChildren(column: WorkspaceLayoutColumn): WorkspaceLayoutColumn[] {
+		return column.children ?? [];
+	}
+
+	function getColumnPanes(column: WorkspaceLayoutColumn) {
+		return column.panes ?? [];
+	}
+
+	let { data }: { data: PageData } = $props();
+
 	let activePaneId = $state<PaneId>('hero');
 	let time = $state(new Date().toLocaleTimeString());
-	let showHelp = $state(false);
 	let scrollSyncFrame = 0;
+	const wallpaperState = createWallpaperState(untrack(() => data.bundledWallpapers));
+	const activeWallpaper = fromStore(wallpaperState.activeWallpaper);
+	const wallpaperModalOpen = fromStore(wallpaperState.modalOpen);
+	const wallpaperDraftUrl = fromStore(wallpaperState.draftUrl);
+	const wallpaperErrorMessage = fromStore(wallpaperState.errorMessage);
+	let activeWorkspaceId = $state<(typeof workspaceLayout)[number]['id']>('workspace-1');
+	let selectedProjectSlug = $state<string | null>(null);
+	let projectSourcePane = $state<PaneId>('projects');
+	let lastHandledProjectNavigationNonce = $state<number | null>(null);
 
-	let activeWorkspace = $derived(getWorkspaceById(getWorkspaceIdForPane(activePaneId)));
+	let activeWorkspace = $derived(getWorkspaceById(activeWorkspaceId));
 
 	function isDesktopViewport(): boolean {
 		return typeof window !== 'undefined' && window.matchMedia('(min-width: 48rem)').matches;
@@ -47,6 +83,7 @@
 
 	function focusPane(paneId: PaneId, shouldFocus = true) {
 		activePaneId = paneId;
+		activeWorkspaceId = getWorkspaceIdForPane(paneId);
 
 		const behavior = getScrollBehavior();
 		const paneDomId = isDesktopViewport() ? paneId : `mobile-${paneId}`;
@@ -71,6 +108,31 @@
 
 		if (shouldFocus) {
 			pane?.focus({ preventScroll: true });
+		}
+	}
+
+	function focusWorkspace(workspaceId: (typeof workspaceLayout)[number]['id']) {
+		activeWorkspaceId = workspaceId;
+
+		if (!isDesktopViewport()) {
+			const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
+			if (firstPaneId) {
+				focusPane(firstPaneId);
+			}
+
+			return;
+		}
+
+		const workspace = document.getElementById(`workspace-${workspaceId}`);
+		workspace?.scrollIntoView({
+			behavior: getScrollBehavior(),
+			block: 'center',
+			inline: 'nearest'
+		});
+
+		const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
+		if (firstPaneId) {
+			focusPane(firstPaneId);
 		}
 	}
 
@@ -113,11 +175,46 @@
 		const viewportRect = viewport.getBoundingClientRect();
 		const centerX = viewportRect.left + viewportRect.width / 2;
 		const centerY = viewportRect.top + viewportRect.height / 2;
+		const workspaceEntries = workspaces
+			.map((workspace) => {
+				const element = document.getElementById(`workspace-${workspace.id}`);
+
+				if (!element) {
+					return null;
+				}
+
+				const rect = element.getBoundingClientRect();
+
+				return {
+					id: workspace.id,
+					rect
+				};
+			})
+			.filter((entry) => entry !== null);
+
+		let nearestWorkspaceId: (typeof workspaces)[number]['id'] | null = null;
+		let nearestWorkspaceScore = Number.POSITIVE_INFINITY;
+
+		for (const workspace of workspaceEntries) {
+			const deltaY = workspace.rect.top + workspace.rect.height / 2 - centerY;
+			const score = deltaY ** 2;
+
+			if (score < nearestWorkspaceScore) {
+				nearestWorkspaceScore = score;
+				nearestWorkspaceId = workspace.id;
+			}
+		}
+
+		if (nearestWorkspaceId) {
+			activeWorkspaceId = nearestWorkspaceId;
+		}
 
 		let nearestPaneId: PaneId | null = null;
 		let nearestScore = Number.POSITIVE_INFINITY;
 
-		for (const pane of document.querySelectorAll<HTMLElement>('[data-pane-id]')) {
+		for (const pane of document.querySelectorAll<HTMLElement>(
+			`#workspace-${nearestWorkspaceId ?? activeWorkspaceId} [data-pane-id]`
+		)) {
 			const rect = pane.getBoundingClientRect();
 			if (rect.width === 0 || rect.height === 0) {
 				continue;
@@ -140,13 +237,26 @@
 	}
 
 	function handleKey(event: KeyboardEvent) {
+		if (wallpaperModalOpen.current) {
+			if (event.key === 'Escape') {
+				event.preventDefault();
+				wallpaperState.closeModal();
+			}
+
+			return;
+		}
+
 		if (shouldIgnoreKeydown(event)) {
 			return;
 		}
 
 		if (event.key === '?') {
 			event.preventDefault();
-			showHelp = !showHelp;
+			if (wallpaperModalOpen.current) {
+				wallpaperState.closeModal();
+			} else {
+				wallpaperState.openModal();
+			}
 			return;
 		}
 
@@ -174,6 +284,20 @@
 	}
 
 	onMount(() => {
+		const unsubscribeProjectNavigation = projectNavigationRequest.subscribe((request) => {
+			if (
+				!request ||
+				typeof document === 'undefined' ||
+				request.nonce === lastHandledProjectNavigationNonce
+			) {
+				return;
+			}
+
+			lastHandledProjectNavigationNonce = request.nonce;
+			openProjectDetail(request.slug, request.sourcePane ?? 'projects');
+			clearProjectNavigationRequest();
+		});
+
 		const interval = setInterval(() => {
 			time = new Date().toLocaleTimeString();
 		}, 1000);
@@ -184,6 +308,7 @@
 		}
 
 		return () => {
+			unsubscribeProjectNavigation();
 			clearInterval(interval);
 			cancelAnimationFrame(scrollSyncFrame);
 		};
@@ -193,31 +318,32 @@
 		activePaneId = paneId as PaneId;
 	}
 
-	function handleWorkspaceAppletClick(workspaceId: (typeof workspaces)[number]['id']) {
-		focusPane(getFirstPaneIdForWorkspace(workspaceId));
+	function handleWorkspaceAppletClick(workspaceId: (typeof workspaceLayout)[number]['id']) {
+		focusWorkspace(workspaceId);
 	}
 
-	$effect(() => {
-		const request = $projectNavigationRequest;
-		if (!request || typeof document === 'undefined') {
-			return;
-		}
+	function openProjectDetail(slug: string, sourcePane: PaneId) {
+		selectedProjectSlug = slug;
+		projectSourcePane = sourcePane;
 
 		focusPane('projects');
-	});
+	}
 
-	$effect(() => {
-		const targetPane = $returnToPane;
-		if (!targetPane || typeof document === 'undefined') {
-			return;
+	function closeProjectDetail(sourcePane: PaneId) {
+		selectedProjectSlug = null;
+		projectSourcePane = 'projects';
+
+		if (sourcePane !== 'projects') {
+			focusPane(sourcePane);
 		}
+	}
 
-		focusPane(targetPane);
-		clearReturnToPane();
-	});
+	function handleOpenSettings() {
+		wallpaperState.openModal();
+	}
 
-	function toggleHelp() {
-		showHelp = !showHelp;
+	function handleWallpaperError() {
+		wallpaperState.fallbackFromFailedWallpaper();
 	}
 </script>
 
@@ -228,30 +354,31 @@
 </svelte:head>
 
 <main
-	class="flex h-full w-full flex-col bg-bg p-[var(--workspace-pane-gap)] font-mono text-fg antialiased md:h-screen md:max-h-screen"
+	class="relative flex h-full w-full flex-col overflow-hidden bg-bg p-[var(--workspace-pane-gap)] font-mono text-fg antialiased md:h-screen md:max-h-screen"
 >
-	{#if showHelp}
-		<div class="fixed inset-0 z-50 flex items-center justify-center bg-bg/90 p-4 backdrop-blur-sm">
-			<div class="border border-border bg-surface p-6">
-				<div class="mb-4 font-bold text-accent">~/help</div>
-				<div class="grid grid-cols-[80px_1fr] gap-2 text-xs">
-					<span class="text-dim">[1]-[6]</span> <span>Focus pane</span>
-					<span class="text-dim">[←][→]</span> <span>Move across columns</span>
-					<span class="text-dim">[↑][↓]</span> <span>Move stack / workspace</span>
-					<span class="text-dim">[?]</span> <span>Toggle this help</span>
-				</div>
-				<button
-					type="button"
-					class="mt-6 border border-dim px-4 py-1 text-xs hover:border-highlight hover:bg-highlight hover:text-black"
-					onclick={() => (showHelp = false)}
-				>
-					Close
-				</button>
-			</div>
+	{#if activeWallpaper.current}
+		<div class="pointer-events-none absolute inset-0 hidden md:block">
+			<img
+				src={activeWallpaper.current.url}
+				alt={activeWallpaper.current.label}
+				class="h-full w-full object-cover"
+				onerror={handleWallpaperError}
+			/>
+			<div class="absolute inset-0 bg-linear-to-br from-bg/55 via-bg/35 to-bg/70"></div>
 		</div>
 	{/if}
 
-	<div class="flex flex-1 flex-col gap-[var(--workspace-pane-gap)] md:min-h-0">
+	{#if wallpaperModalOpen.current}
+		<SettingsModal
+			errorMessage={wallpaperErrorMessage.current}
+			inputValue={wallpaperDraftUrl.current}
+			onClose={wallpaperState.closeModal}
+			onInput={wallpaperState.updateDraftUrl}
+			onSave={wallpaperState.saveCustomWallpaper}
+		/>
+	{/if}
+
+	<div class="relative z-10 flex flex-1 flex-col gap-[var(--workspace-pane-gap)] md:min-h-0">
 		<div class="grid grid-cols-1 gap-[var(--workspace-pane-gap)] md:hidden">
 			{#each mobilePaneOrder as pane (pane.id)}
 				{@const PaneComponent = pane.component}
@@ -265,16 +392,23 @@
 					{activePaneId}
 					onFocus={handlePaneFocus}
 				>
-					<PaneComponent />
+					{#if pane.id === 'projects'}
+						<PaneComponent
+							{selectedProjectSlug}
+							sourcePane={projectSourcePane}
+							onOpenProject={openProjectDetail}
+							onCloseProject={closeProjectDetail}
+						/>
+					{:else}
+						<PaneComponent />
+					{/if}
 				</TwmPane>
 			{/each}
 		</div>
 
-		<section
-			class="workspace-stage hidden min-h-0 flex-1 overflow-hidden border border-border/70 bg-surface/30 p-[var(--workspace-pane-gap)] md:flex"
-		>
+		<section class="hidden min-h-0 flex-1 overflow-hidden md:flex">
 			<div id={desktopViewportId} class="workspace-viewport flex-1" onscroll={queueViewportSync}>
-				{#each workspaces as workspace (workspace.id)}
+				{#each workspaceLayout as workspace (workspace.id)}
 					<section id={`workspace-${workspace.id}`} class="workspace-sheet">
 						<div
 							class="workspace-rail"
@@ -286,20 +420,86 @@
 									class={`workspace-column ${column.className}`}
 									data-column-id={`${workspace.id}:${column.id}`}
 								>
-									{#each column.panes as pane (pane.id)}
-										{@const PaneComponent = pane.component}
-										<TwmPane
-											id={pane.id}
-											domId={pane.id}
-											title={pane.title}
-											shortcut={pane.shortcut}
-											className={pane.className ?? ''}
-											{activePaneId}
-											onFocus={handlePaneFocus}
-										>
-											<PaneComponent />
-										</TwmPane>
-									{/each}
+									{#if getColumnChildren(column).length}
+										{#each getColumnChildren(column) as child (child.id)}
+											<div
+												class={`workspace-column ${child.className}`}
+												data-column-id={`${workspace.id}:${child.id}`}
+											>
+												{#if getColumnChildren(child).length}
+													{#each getColumnChildren(child) as nested (nested.id)}
+														<div
+															class={`workspace-column ${nested.className}`}
+															data-column-id={`${workspace.id}:${nested.id}`}
+														>
+															{#each getColumnPanes(nested) as pane (pane.id)}
+																{@const PaneComponent = pane.component}
+																<TwmPane
+																	id={pane.id}
+																	domId={pane.id}
+																	title={pane.title}
+																	shortcut={pane.shortcut}
+																	className={pane.className ?? ''}
+																	{activePaneId}
+																	onFocus={handlePaneFocus}
+																>
+																	<PaneComponent />
+																</TwmPane>
+															{/each}
+														</div>
+													{/each}
+												{:else}
+													{#each getColumnPanes(child) as pane (pane.id)}
+														{@const PaneComponent = pane.component}
+														<TwmPane
+															id={pane.id}
+															domId={pane.id}
+															title={pane.title}
+															shortcut={pane.shortcut}
+															className={pane.className ?? ''}
+															{activePaneId}
+															onFocus={handlePaneFocus}
+														>
+															{#if pane.id === 'projects'}
+																<PaneComponent
+																	{selectedProjectSlug}
+																	sourcePane={projectSourcePane}
+																	onOpenProject={openProjectDetail}
+																	onCloseProject={closeProjectDetail}
+																/>
+															{:else}
+																<PaneComponent />
+															{/if}
+														</TwmPane>
+													{/each}
+												{/if}
+											</div>
+										{/each}
+									{:else}
+										{#each getColumnPanes(column) as pane (pane.id)}
+											{@const PaneComponent = pane.component}
+											<TwmPane
+												id={pane.id}
+												domId={pane.id}
+												title={pane.title}
+												shortcut={pane.shortcut}
+												className={pane.className ?? ''}
+												{activePaneId}
+												onFocus={handlePaneFocus}
+											>
+												{#if pane.id === 'projects'}
+													<PaneComponent
+														{selectedProjectSlug}
+														sourcePane={projectSourcePane}
+														onOpenProject={openProjectDetail}
+														onCloseProject={closeProjectDetail}
+													/>
+												{:else}
+													<PaneComponent />
+												{/if}
+											</TwmPane>
+										{/each}
+									{/if}
 								</div>
 							{/each}
 						</div>
@@ -319,6 +519,7 @@
 		{workspaces}
 		{time}
 		role={profile.role}
-		onToggleHelp={toggleHelp}
+		onCycleWallpaper={wallpaperState.cycleWallpaper}
+		onOpenSettings={handleOpenSettings}
 	/>
 </main>

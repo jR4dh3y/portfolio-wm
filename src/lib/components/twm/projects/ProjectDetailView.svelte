@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { ArrowUpRight, Github, StepBack } from 'lucide-svelte';
 	import type { Project } from '$lib/data';
-	import * as Lucide from 'lucide-svelte';
 
 	let {
 		project,
@@ -25,7 +25,7 @@
 				class="inline-flex items-center gap-2 border border-border bg-surface px-3 py-1.5 font-mono text-[10px] text-dim uppercase transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 				aria-label="Back to projects list"
 			>
-				<Lucide.ChevronLeft size={14} />
+				<StepBack class="h-3.5 w-3.5" aria-hidden="true" />
 				Back
 			</button>
 		</div>
@@ -41,7 +41,7 @@
 					class="inline-flex items-center gap-2 border border-border bg-surface px-3 py-1.5 font-mono text-[10px] text-dim uppercase transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 					aria-label={`Open ${project.title} source code`}
 				>
-					<Lucide.Github size={14} />
+					<Github class="h-3.5 w-3.5" aria-hidden="true" />
 					Source
 				</a>
 				{#if project.liveUrl}
@@ -52,7 +52,7 @@
 						class="inline-flex items-center gap-2 border border-border bg-surface px-3 py-1.5 font-mono text-[10px] text-dim uppercase transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 						aria-label={`Open ${project.title} live site`}
 					>
-						<Lucide.ArrowUpRight size={14} />
+						<ArrowUpRight class="h-3.5 w-3.5" aria-hidden="true" />
 						Live
 					</a>
 				{/if}
