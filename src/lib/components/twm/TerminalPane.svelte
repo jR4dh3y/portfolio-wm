@@ -25,7 +25,7 @@
 		{ type: 'output', content: '                                   Disk      59G / 218G (29%)' },
 		{ type: 'output', content: '                                   ─────────────────────────────' },
 		{ type: 'input', content: '$ help' },
-		{ type: 'output', content: 'Commands: neofetch, docker ps, clear' }
+		{ type: 'output', content: 'Commands: neofetch, docker ps, clear, exit' }
 	];
 
 	const terminalCommands: Record<string, string[]> = {

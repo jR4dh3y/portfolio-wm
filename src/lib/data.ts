@@ -181,6 +181,16 @@ export const projects: Project[] = [
 		githubUrl: 'https://github.com/jR4dh3y/dots-niri'
 	},
 	{
+		title: 'Victus Control (HPOmen-linux)',
+		desc: [
+			'Linux-first control surface for HP Victus hardware with a GTK4 monitor window, GTK3 tray companion, and probe CLI.',
+			'Provides D-Bus-powered hardware profile switching (cool, quiet, balanced, performance), validated fan modes, and temperature-aware automation.'
+		],
+		image: '/assets/omenmon.png',
+		tags: ['Vala', 'GTK4', 'D-Bus', 'Linux', 'Meson', 'AppIndicator'],
+		githubUrl: 'https://github.com/jR4dh3y/HPOmen-linux'
+	},
+	{
 		title: 'WallpyGui',
 		desc: ['Wallpaper manager for Wayland compositors with support for Video as Wallpaper.'],
 		image: '/assets/wall.png',
@@ -195,21 +205,28 @@ export const projects: Project[] = [
 		githubUrl: 'https://github.com/jR4dh3y/iwd-applet'
 	},
 	{
-		title: 'Victus Control (HPOmen-linux)',
-		desc: [
-			'Linux-first control surface for HP Victus hardware with a GTK4 monitor window, GTK3 tray companion, and probe CLI.',
-			'Provides D-Bus-powered hardware profile switching (cool, quiet, balanced, performance), validated fan modes, and temperature-aware automation.'
-		],
-		image: '/assets/omenmon.png',
-		tags: ['Vala', 'GTK4', 'D-Bus', 'Linux', 'Meson', 'AppIndicator'],
-		githubUrl: 'https://github.com/jR4dh3y/HPOmen-linux'
-	},
-	{
 		title: 'Terminal Doom',
 		desc: ['Doom styled game that runs in terminal using ncurses library.'],
 		image: '/assets/doom.png',
 		tags: ['C++', 'ncurses', 'cmake', 'Game Dev'],
 		githubUrl: 'https://github.com/jR4dh3y/doom-in-terminal'
+	},
+	{
+		title: 'TL;DR AI',
+		desc: [
+			'Summarize WhatsApp Groups Chats using AI. Uses your openrouter API key to process data (you can use free models).'
+		],
+		image: 'https://github.com/jR4dh3y/tldr-desktop/raw/master/img/ss.png',
+		tags: ['React', 'Electron', 'TypeScript', 'OpenRouter'],
+		githubUrl: 'https://github.com/jR4dh3y/tldr-desktop'
+	},
+	{
+		title: 'HowTo',
+		desc: ['Minimal technical tutorials and guides site built with Astro and Tailwind CSS.'],
+		image: '/assets/howto.png',
+		tags: ['Astro', 'Tailwind CSS', 'TypeScript', 'Guides'],
+		githubUrl: 'https://github.com/jR4dh3y/howTo',
+		liveUrl: 'https://howto.jr4.in'
 	},
 	{
 		title: 'Community Leaderboard',
@@ -249,28 +266,11 @@ export const projects: Project[] = [
 		liveUrl: 'https://anyconv.jr4.in'
 	},
 	{
-		title: 'TL;DR AI',
-		desc: [
-			'Summarize WhatsApp Groups Chats using AI. Uses your openrouter API key to process data (you can use free models).'
-		],
-		image: 'https://github.com/jR4dh3y/tldr-desktop/raw/master/img/ss.png',
-		tags: ['React', 'Electron', 'TypeScript', 'OpenRouter'],
-		githubUrl: 'https://github.com/jR4dh3y/tldr-desktop'
-	},
-	{
 		title: 'Tenant Manager',
 		desc: ['A mobile app to manage tenant and log their electricity usages.'],
 		image: 'https://github.com/jR4dh3y/tennet-manager/raw/master/photo.png',
 		tags: ['React Native', 'Expo', 'TypeScript'],
 		githubUrl: 'https://github.com/jR4dh3y/tennet-manager'
-	},
-	{
-		title: 'HowTo',
-		desc: ['Minimal technical tutorials and guides site built with Astro and Tailwind CSS.'],
-		image: '/assets/howto.png',
-		tags: ['Astro', 'Tailwind CSS', 'TypeScript', 'Guides'],
-		githubUrl: 'https://github.com/jR4dh3y/howTo',
-		liveUrl: 'https://howto.jr4.in'
 	}
 ];
 
