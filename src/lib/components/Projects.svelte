@@ -6,13 +6,13 @@
 	const others = projects.slice(4);
 </script>
 
-<section id="work" class="bg-grid w-full border-b-2 border-foreground py-24">
+<section id="work" class="bg-grid border-foreground w-full border-b-2 py-24">
 	<div class="container mx-auto px-4">
 		<div
 			class="mb-16 flex items-center justify-between border-b-2 border-[var(--color-primary)] pb-4"
 		>
 			<h2
-				class="font-syne text-5xl font-black tracking-tighter text-foreground uppercase md:text-8xl"
+				class="font-syne text-foreground text-5xl font-black tracking-tighter uppercase md:text-8xl"
 			>
 				Projects
 			</h2>
@@ -33,12 +33,12 @@
 					></div>
 
 					<!-- Header -->
-					<header class="flex items-start justify-between border-b-2 border-foreground p-6 md:p-8">
+					<header class="border-foreground flex items-start justify-between border-b-2 p-6 md:p-8">
 						<div class="w-full">
 							<span class="mb-2 block font-mono text-sm font-bold text-[var(--color-primary)]"
 								>0{index + 1}.</span
 							>
-							<h3 class="pr-8 font-syne text-3xl font-bold tracking-tight break-words uppercase">
+							<h3 class="font-syne pr-8 text-3xl font-bold tracking-tight break-words uppercase">
 								{project.title}
 							</h3>
 						</div>
@@ -92,7 +92,7 @@
 
 		<!-- Other Projects -->
 		<h3
-			class="mb-8 inline-block border-b-2 border-[var(--color-secondary)] pb-2 font-syne text-3xl font-black tracking-tighter text-foreground uppercase"
+			class="font-syne text-foreground mb-8 inline-block border-b-2 border-[var(--color-secondary)] pb-2 text-3xl font-black tracking-tighter uppercase"
 		>
 			More Experiments
 		</h3>
@@ -103,7 +103,7 @@
 					class="brutalist-border flex h-full flex-col bg-[var(--color-card)] p-6 transition-all duration-200 hover:-translate-y-1 hover:border-[var(--color-primary)]"
 				>
 					<div class="mb-4 flex items-start justify-between">
-						<h4 class="font-syne text-xl font-bold tracking-tight text-foreground uppercase">
+						<h4 class="font-syne text-foreground text-xl font-bold tracking-tight uppercase">
 							{project.title}
 						</h4>
 						<div class="flex shrink-0 gap-3">

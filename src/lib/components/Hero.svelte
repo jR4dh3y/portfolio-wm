@@ -19,7 +19,7 @@
 </script>
 
 <section
-	class="bg-grid relative flex min-h-[90vh] w-full flex-col justify-center overflow-hidden border-b-2 border-foreground pt-24 pb-12"
+	class="bg-grid border-foreground relative flex min-h-[90vh] w-full flex-col justify-center overflow-hidden border-b-2 pt-24 pb-12"
 >
 	<div class="relative z-10 container mx-auto flex w-full flex-col items-start px-4">
 		<!-- Top Section: Name + Floating Photo -->
@@ -29,7 +29,7 @@
 			<!-- Giant Typography -->
 			<div class="pointer-events-none relative z-30 flex w-full flex-col md:w-auto">
 				<h1
-					class="m-0 p-0 font-syne text-[14vw] leading-[0.85] font-black tracking-tighter text-foreground uppercase transition-colors duration-500 hover:text-[var(--color-primary)] md:text-[12vw] lg:text-[11vw]"
+					class="font-syne text-foreground m-0 p-0 text-[14vw] leading-[0.85] font-black tracking-tighter uppercase transition-colors duration-500 hover:text-[var(--color-primary)] md:text-[12vw] lg:text-[11vw]"
 				>
 					{profile.name}
 				</h1>
@@ -46,15 +46,15 @@
 				class="pointer-events-auto absolute top-0 right-0 z-20 hidden w-[260px] translate-y-[-10%] transform md:top-auto md:flex md:translate-y-[-20%] lg:w-[320px] xl:translate-y-[-30%]"
 			>
 				<div
-					class="brutalist-border w-full rotate-[4deg] bg-foreground p-2 transition-transform duration-300 hover:rotate-0"
+					class="brutalist-border bg-foreground w-full rotate-[4deg] p-2 transition-transform duration-300 hover:rotate-0"
 				>
 					<img
 						src={profile.photo}
 						alt={profile.name}
-						class="aspect-square w-full border-2 border-background object-cover contrast-125 grayscale"
+						class="border-background aspect-square w-full border-2 object-cover contrast-125 grayscale"
 					/>
 					<div
-						class="mt-2 border-2 border-background bg-card p-2 text-center font-mono text-xs font-bold text-[var(--color-secondary)] uppercase"
+						class="border-background bg-card mt-2 border-2 p-2 text-center font-mono text-xs font-bold text-[var(--color-secondary)] uppercase"
 					>
 						ID: {profile.name}_{profile.lastName}
 					</div>
@@ -67,15 +67,15 @@
 			class="relative z-20 mt-8 flex w-full max-w-[280px] shrink-0 items-end justify-start md:hidden"
 		>
 			<div
-				class="brutalist-border w-full rotate-[4deg] bg-foreground p-2 transition-transform duration-300 hover:rotate-0"
+				class="brutalist-border bg-foreground w-full rotate-[4deg] p-2 transition-transform duration-300 hover:rotate-0"
 			>
 				<img
 					src={profile.photo}
 					alt={profile.name}
-					class="aspect-square w-full border-2 border-background object-cover contrast-125 grayscale"
+					class="border-background aspect-square w-full border-2 object-cover contrast-125 grayscale"
 				/>
 				<div
-					class="mt-2 border-2 border-background bg-card p-2 text-center font-mono text-xs font-bold text-[var(--color-secondary)] uppercase"
+					class="border-background bg-card mt-2 border-2 p-2 text-center font-mono text-xs font-bold text-[var(--color-secondary)] uppercase"
 				>
 					ID: {profile.name}_{profile.lastName}
 				</div>
@@ -97,7 +97,7 @@
 							target="_blank"
 							rel="noopener noreferrer"
 							aria-label={link.label}
-							class="brutalist-border bg-foreground p-3 text-background transition-colors hover:bg-[var(--color-primary)]"
+							class="brutalist-border bg-foreground text-background p-3 transition-colors hover:bg-[var(--color-primary)]"
 						>
 							<Icon class="h-5 w-5" />
 						</a>
@@ -107,10 +107,10 @@
 		</div>
 
 		<!-- Footer of Hero -->
-		<div class="mt-16 flex w-full items-end justify-end border-t-2 border-foreground pt-6">
+		<div class="border-foreground mt-16 flex w-full items-end justify-end border-t-2 pt-6">
 			<a
 				href="#about"
-				class="brutalist-border flex items-center justify-center rounded-none bg-foreground p-4 text-background transition-colors hover:bg-[var(--color-secondary)]"
+				class="brutalist-border bg-foreground text-background flex items-center justify-center rounded-none p-4 transition-colors hover:bg-[var(--color-secondary)]"
 			>
 				<ArrowDownRight class="h-6 w-6" />
 			</a>

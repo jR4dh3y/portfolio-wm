@@ -1,15 +1,6 @@
-import { readdir } from 'node:fs/promises';
-import { join } from 'node:path';
-
 import type { WallpaperSource } from '$lib/stores/wallpaper';
 
-const wallpaperDirectory = join(process.cwd(), 'static', 'wallpapers');
-const supportedExtensions = new Set(['.avif', '.gif', '.jpeg', '.jpg', '.png', '.webp']);
-
-function getExtension(filename: string): string {
-	const extensionIndex = filename.lastIndexOf('.');
-	return extensionIndex === -1 ? '' : filename.slice(extensionIndex).toLowerCase();
-}
+const bundledFiles = ['lucy.jpeg', 'max.png', 'ryo.png', 'wall.png'] as const;
 
 function toWallpaperLabel(filename: string): string {
 	return filename
@@ -18,20 +9,13 @@ function toWallpaperLabel(filename: string): string {
 		.trim();
 }
 
-export async function getBundledWallpapers(): Promise<WallpaperSource[]> {
-	try {
-		const entries = await readdir(wallpaperDirectory, { withFileTypes: true });
-
-		return entries
-			.filter((entry) => entry.isFile() && supportedExtensions.has(getExtension(entry.name)))
-			.map((entry) => ({
-				id: `bundled:${entry.name}`,
-				label: toWallpaperLabel(entry.name) || entry.name,
-				kind: 'bundled' as const,
-				url: `/wallpapers/${entry.name}`
-			}))
-			.sort((left, right) => left.label.localeCompare(right.label, undefined, { numeric: true }));
-	} catch {
-		return [];
-	}
+export function getBundledWallpapers(): WallpaperSource[] {
+	return bundledFiles
+		.map((filename) => ({
+			id: `bundled:${filename}`,
+			label: toWallpaperLabel(filename) || filename,
+			kind: 'bundled' as const,
+			url: `/wallpapers/${filename}`
+		}))
+		.sort((left, right) => left.label.localeCompare(right.label, undefined, { numeric: true }));
 }

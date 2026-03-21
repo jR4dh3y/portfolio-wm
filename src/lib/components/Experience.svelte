@@ -5,7 +5,7 @@
 
 <section
 	id="experience"
-	class="w-full border-b-2 border-foreground bg-[var(--color-background)] py-24"
+	class="border-foreground w-full border-b-2 bg-[var(--color-background)] py-24"
 >
 	<div class="container mx-auto px-4">
 		<div class="mb-16">
@@ -18,17 +18,17 @@
 		</div>
 
 		<div
-			class="relative ml-auto flex max-w-5xl flex-col gap-12 border-l-4 border-foreground pl-8 md:pl-16"
+			class="border-foreground relative ml-auto flex max-w-5xl flex-col gap-12 border-l-4 pl-8 md:pl-16"
 		>
 			{#each experience as exp (exp.company + exp.role)}
 				<div class="group relative">
 					<div
-						class="absolute top-0 -left-[42px] h-6 w-6 border-4 border-background bg-[var(--color-secondary)] transition-colors group-hover:bg-[var(--color-primary)] md:-left-[74px]"
+						class="border-background absolute top-0 -left-[42px] h-6 w-6 border-4 bg-[var(--color-secondary)] transition-colors group-hover:bg-[var(--color-primary)] md:-left-[74px]"
 					></div>
 
 					<div class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
 						<div>
-							<h3 class="font-syne text-2xl font-bold text-foreground uppercase md:text-3xl">
+							<h3 class="font-syne text-foreground text-2xl font-bold uppercase md:text-3xl">
 								{exp.role}
 							</h3>
 							<h4 class="mt-1 font-mono text-lg text-[var(--color-primary)] md:text-xl">
@@ -56,7 +56,7 @@
 										href={link.href}
 										target="_blank"
 										rel="noopener noreferrer"
-										class="inline-flex items-center gap-2 border-b border-transparent pb-1 font-mono text-sm text-foreground transition-all hover:border-[var(--color-secondary)] hover:text-[var(--color-secondary)]"
+										class="text-foreground inline-flex items-center gap-2 border-b border-transparent pb-1 font-mono text-sm transition-all hover:border-[var(--color-secondary)] hover:text-[var(--color-secondary)]"
 									>
 										<ExternalLink class="h-4 w-4" />
 										{link.label}
@@ -68,7 +68,7 @@
 						<div class="flex flex-wrap gap-2">
 							{#each exp.skills as skill (skill)}
 								<span
-									class="brutalist-border bg-foreground px-2 py-1 font-mono text-xs font-bold text-background uppercase transition-transform hover:-translate-y-1"
+									class="brutalist-border bg-foreground text-background px-2 py-1 font-mono text-xs font-bold uppercase transition-transform hover:-translate-y-1"
 								>
 									{skill}
 								</span>

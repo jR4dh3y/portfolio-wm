@@ -10,6 +10,6 @@ export const load: PageServerLoad = async ({ request }) => {
 	}
 
 	return {
-		bundledWallpapers: await getBundledWallpapers()
+		bundledWallpapers: getBundledWallpapers()
 	};
 };

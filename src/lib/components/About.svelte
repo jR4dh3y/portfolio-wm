@@ -4,13 +4,13 @@
 
 <section
 	id="about"
-	class="relative w-full border-b-2 border-foreground bg-[var(--color-background)] py-24"
+	class="border-foreground relative w-full border-b-2 bg-[var(--color-background)] py-24"
 >
 	<div class="container mx-auto px-4">
 		<div class="grid grid-cols-1 items-start gap-12 md:grid-cols-12 md:gap-8">
 			<div class="md:col-span-4">
 				<h2
-					class="mb-4 font-syne text-5xl font-black tracking-tighter text-[var(--color-primary)] uppercase md:text-7xl"
+					class="font-syne mb-4 text-5xl font-black tracking-tighter text-[var(--color-primary)] uppercase md:text-7xl"
 				>
 					About<br />Me.
 				</h2>
@@ -30,11 +30,11 @@
 					</p>
 				{/each}
 
-				<div class="brutalist-border mt-8 w-full max-w-md bg-card p-6">
+				<div class="brutalist-border bg-card mt-8 w-full max-w-md p-6">
 					<p class="mb-4 text-sm font-bold tracking-widest text-[var(--color-secondary)] uppercase">
 						// Currently Listening
 					</p>
-					<div class="h-32 w-full border-2 border-foreground bg-gray-900">
+					<div class="border-foreground h-32 w-full border-2 bg-gray-900">
 						<iframe
 							src="https://open.spotify.com/embed/playlist/7d8zl8UGKsGmGLzzOm7t1r?utm_source=generator&theme=0"
 							width="100%"
