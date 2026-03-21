@@ -192,10 +192,13 @@
 
 		.workspace-column {
 			display: flex;
-			flex: 0 0 auto;
 			gap: var(--workspace-pane-gap);
 			height: 100%;
 			min-height: 0;
+		}
+
+		.workspace-rail > .workspace-column {
+			flex: 0 0 auto;
 			scroll-snap-align: center;
 			scroll-snap-stop: always;
 		}

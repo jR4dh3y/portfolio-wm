@@ -19,12 +19,35 @@
 		shortcutToPaneId,
 		workspaces,
 		type Direction,
-		type PaneId
+		type PaneMeta,
+		type PaneId,
+		type WorkspaceMeta
 	} from '$lib/components/twm/layout';
 	import { createWallpaperState } from '$lib/stores/wallpaper';
 	import type { PageData } from './$types';
 
 	const desktopViewportId = 'workspace-viewport';
+
+	type WorkspaceLayoutColumn = {
+		id: string;
+		className: string;
+		panes?: PaneMeta[];
+		children?: WorkspaceLayoutColumn[];
+	};
+
+	type WorkspaceLayoutMeta = Omit<WorkspaceMeta, 'columns'> & {
+		columns: WorkspaceLayoutColumn[];
+	};
+
+	const workspaceLayout = workspaces as WorkspaceLayoutMeta[];
+
+	function getColumnChildren(column: WorkspaceLayoutColumn): WorkspaceLayoutColumn[] {
+		return column.children ?? [];
+	}
+
+	function getColumnPanes(column: WorkspaceLayoutColumn) {
+		return column.panes ?? [];
+	}
 
 	let { data }: { data: PageData } = $props();
 
@@ -36,7 +59,7 @@
 	const wallpaperModalOpen = fromStore(wallpaperState.modalOpen);
 	const wallpaperDraftUrl = fromStore(wallpaperState.draftUrl);
 	const wallpaperErrorMessage = fromStore(wallpaperState.errorMessage);
-	let activeWorkspaceId = $state<(typeof workspaces)[number]['id']>('workspace-1');
+	let activeWorkspaceId = $state<(typeof workspaceLayout)[number]['id']>('workspace-1');
 	let selectedProjectSlug = $state<string | null>(null);
 	let projectSourcePane = $state<PaneId>('projects');
 	let lastHandledProjectNavigationNonce = $state<number | null>(null);
@@ -88,7 +111,7 @@
 		}
 	}
 
-	function focusWorkspace(workspaceId: (typeof workspaces)[number]['id']) {
+	function focusWorkspace(workspaceId: (typeof workspaceLayout)[number]['id']) {
 		activeWorkspaceId = workspaceId;
 
 		if (!isDesktopViewport()) {
@@ -295,7 +318,7 @@
 		activePaneId = paneId as PaneId;
 	}
 
-	function handleWorkspaceAppletClick(workspaceId: (typeof workspaces)[number]['id']) {
+	function handleWorkspaceAppletClick(workspaceId: (typeof workspaceLayout)[number]['id']) {
 		focusWorkspace(workspaceId);
 	}
 
@@ -385,7 +408,7 @@
 
 		<section class="hidden min-h-0 flex-1 overflow-hidden md:flex">
 			<div id={desktopViewportId} class="workspace-viewport flex-1" onscroll={queueViewportSync}>
-				{#each workspaces as workspace (workspace.id)}
+				{#each workspaceLayout as workspace (workspace.id)}
 					<section id={`workspace-${workspace.id}`} class="workspace-sheet">
 						<div
 							class="workspace-rail"
@@ -397,29 +420,86 @@
 									class={`workspace-column ${column.className}`}
 									data-column-id={`${workspace.id}:${column.id}`}
 								>
-									{#each column.panes as pane (pane.id)}
-										{@const PaneComponent = pane.component}
-										<TwmPane
-											id={pane.id}
-											domId={pane.id}
-											title={pane.title}
-											shortcut={pane.shortcut}
-											className={pane.className ?? ''}
-											{activePaneId}
-											onFocus={handlePaneFocus}
-										>
-											{#if pane.id === 'projects'}
-												<PaneComponent
-													{selectedProjectSlug}
-													sourcePane={projectSourcePane}
-													onOpenProject={openProjectDetail}
-													onCloseProject={closeProjectDetail}
-												/>
-											{:else}
-												<PaneComponent />
-											{/if}
-										</TwmPane>
-									{/each}
+									{#if getColumnChildren(column).length}
+										{#each getColumnChildren(column) as child (child.id)}
+											<div
+												class={`workspace-column ${child.className}`}
+												data-column-id={`${workspace.id}:${child.id}`}
+											>
+												{#if getColumnChildren(child).length}
+													{#each getColumnChildren(child) as nested (nested.id)}
+														<div
+															class={`workspace-column ${nested.className}`}
+															data-column-id={`${workspace.id}:${nested.id}`}
+														>
+															{#each getColumnPanes(nested) as pane (pane.id)}
+																{@const PaneComponent = pane.component}
+																<TwmPane
+																	id={pane.id}
+																	domId={pane.id}
+																	title={pane.title}
+																	shortcut={pane.shortcut}
+																	className={pane.className ?? ''}
+																	{activePaneId}
+																	onFocus={handlePaneFocus}
+																>
+																	<PaneComponent />
+																</TwmPane>
+															{/each}
+														</div>
+													{/each}
+												{:else}
+													{#each getColumnPanes(child) as pane (pane.id)}
+														{@const PaneComponent = pane.component}
+														<TwmPane
+															id={pane.id}
+															domId={pane.id}
+															title={pane.title}
+															shortcut={pane.shortcut}
+															className={pane.className ?? ''}
+															{activePaneId}
+															onFocus={handlePaneFocus}
+														>
+															{#if pane.id === 'projects'}
+																<PaneComponent
+																	{selectedProjectSlug}
+																	sourcePane={projectSourcePane}
+																	onOpenProject={openProjectDetail}
+																	onCloseProject={closeProjectDetail}
+																/>
+															{:else}
+																<PaneComponent />
+															{/if}
+														</TwmPane>
+													{/each}
+												{/if}
+											</div>
+										{/each}
+									{:else}
+										{#each getColumnPanes(column) as pane (pane.id)}
+											{@const PaneComponent = pane.component}
+											<TwmPane
+												id={pane.id}
+												domId={pane.id}
+												title={pane.title}
+												shortcut={pane.shortcut}
+												className={pane.className ?? ''}
+												{activePaneId}
+												onFocus={handlePaneFocus}
+											>
+												{#if pane.id === 'projects'}
+													<PaneComponent
+														{selectedProjectSlug}
+														sourcePane={projectSourcePane}
+														onOpenProject={openProjectDetail}
+														onCloseProject={closeProjectDetail}
+													/>
+												{:else}
+													<PaneComponent />
+												{/if}
+											</TwmPane>
+										{/each}
+									{/if}
 								</div>
 							{/each}
 						</div>

@@ -36,6 +36,60 @@ export const experience = [
 	}
 ];
 
+export type Certification = {
+	title: string;
+	issuer: string;
+	issued: string;
+	href?: string;
+	note?: string;
+};
+
+export const certifications: Certification[] = [
+	{
+		title: 'Google Cybersecurity',
+		issuer: 'Google',
+		issued: 'Credential',
+		href: 'https://drive.google.com/file/d/1SIxLO0PLcOsLC0SQkZri6dQD1kyKAooL/view?usp=sharing'
+	},
+	{
+		title: 'Cybersecurity Operations Fundamentals',
+		issuer: 'Cisco',
+		issued: 'Credential',
+		href: 'https://drive.google.com/file/d/1GzR6t8wylBR3NqwdkuLobi6jAqEr0CcG/view?usp=sharing'
+	},
+	{
+		title: 'Ethical Hacking',
+		issuer: 'NPTEL - IIT Kharagpur',
+		issued: 'Credential',
+		href: 'https://archive.nptel.ac.in/content/noc/NOC24/SEM2/Ecertificates/106/noc24-cs94/Course/NPTEL24CS94S35440004903810809.pdf'
+	},
+	{
+		title: 'Deep Learning',
+		issuer: 'NPTEL - IIT Ropar',
+		issued: 'Credential',
+		href: 'https://archive.nptel.ac.in/content/noc/NOC25/SEM2/Ecertificates/106/noc25-cs106/Course/NPTEL25CS106S45890051510210361.pdf'
+	},
+	{
+		title: 'AI Agent Architect',
+		issuer: 'IBM SkillsBuild',
+		issued: 'Credential',
+		href: 'https://drive.google.com/file/d/19Pmeutg62bbuCQ1M5NDx4nc2zKQgZ2ig/view'
+	},
+	{
+		title: 'IDE Bootcamp',
+		issuer: 'AICTE / MoE',
+		issued: 'Credential',
+		href: 'https://drive.google.com/file/d/1zPWEANVHF5TArUIdF3m7mu7goTPxbUPX/view?usp=sharing'
+	}
+];
+
+export const experiencePaneSpotify = {
+	embedUrl: 'https://open.spotify.com/embed/playlist/7d8zl8UGKsGmGLzzOm7t1r?utm_source=generator',
+	openUrl: 'https://open.spotify.com/playlist/7d8zl8UGKsGmGLzzOm7t1r?utm_source=generator',
+	title: 'Current soundtrack',
+	description: 'A small playlist window for the tracks shaping the build sessions.'
+};
+
 export const homelab = {
 	paragraphs: [
 		'I enjoy building and maintaining infrastructure as much as writing applications. I run and maintain my own home server for hosting applications, internal tools, and experiments.',

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { StepBack } from 'lucide-svelte';
+	import { ArrowUpRight } from 'lucide-svelte';
 	import { experience } from '$lib/data';
 </script>
 
-<div class="flex h-full w-full flex-col gap-12 p-4 sm:p-8">
-	<section>
+<div class="h-full min-h-0 w-full p-4 sm:p-8">
+	<section class="h-full min-h-0 overflow-auto pr-2">
 		<div class="flex flex-col gap-8 border-l border-border pl-4">
 			{#each experience as exp (exp.role)}
 				<div class="relative flex flex-col gap-1">
@@ -26,7 +26,7 @@
 									class="inline-flex items-center gap-1 border-b border-dim pb-0.5 font-mono text-[10px] text-dim transition-colors hover:border-highlight hover:bg-highlight hover:text-black"
 								>
 									{link.label}
-									<StepBack class="h-3 w-3 rotate-180" aria-hidden="true" />
+									<ArrowUpRight class="h-3 w-3" aria-hidden="true" />
 								</a>
 							{/each}
 						</div>

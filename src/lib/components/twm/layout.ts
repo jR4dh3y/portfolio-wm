@@ -1,11 +1,13 @@
 import type { Component } from 'svelte';
 
 import AboutPane from '$lib/components/twm/AboutPane.svelte';
+import CertificationsPane from '$lib/components/twm/CertificationsPane.svelte';
 import ExperiencePane from '$lib/components/twm/ExperiencePane.svelte';
 import HeroPane from '$lib/components/twm/HeroPane.svelte';
 import HomelabPane from '$lib/components/twm/HomelabPane.svelte';
 import ProjectsPane from '$lib/components/twm/ProjectsPane.svelte';
 import SkillsPane from '$lib/components/twm/SkillsPane.svelte';
+import SpotifyPane from '$lib/components/twm/SpotifyPane.svelte';
 import TerminalPane from '$lib/components/twm/TerminalPane.svelte';
 
 export type PaneId =
@@ -15,7 +17,9 @@ export type PaneId =
 	| 'about'
 	| 'skills'
 	| 'projects'
-	| 'experience';
+	| 'experience'
+	| 'certifications'
+	| 'spotify';
 export type WorkspaceId = 'workspace-1' | 'workspace-2' | 'workspace-3';
 export type Direction = 'left' | 'right' | 'up' | 'down';
 
@@ -30,7 +34,8 @@ export type PaneMeta = {
 export type WorkspaceColumn = {
 	id: string;
 	className: string;
-	panes: PaneMeta[];
+	panes?: PaneMeta[];
+	children?: WorkspaceColumn[];
 };
 
 export type WorkspaceMeta = {
@@ -106,6 +111,20 @@ export const panes: Record<PaneId, PaneMeta> = {
 		shortcut: '6',
 		component: ExperiencePane,
 		className: 'h-full'
+	},
+	certifications: {
+		id: 'certifications',
+		title: 'certifications.log',
+		shortcut: '7',
+		component: CertificationsPane,
+		className: 'h-full min-h-0'
+	},
+	spotify: {
+		id: 'spotify',
+		title: 'spotify.embed',
+		shortcut: '8',
+		component: SpotifyPane,
+		className: 'h-full min-h-0'
 	}
 };
 
@@ -144,9 +163,31 @@ export const workspaces: WorkspaceMeta[] = [
 				panes: [panes.projects]
 			},
 			{
-				id: 'experience-column',
-				className: 'w-[50%] min-w-[50%] max-w-[50%]',
-				panes: [panes.experience]
+				id: 'details-column',
+				className: 'flex-col w-[50%] min-w-[50%] max-w-[50%]',
+				children: [
+					{
+						id: 'experience-row',
+						className: 'min-h-0 flex-[55]',
+						panes: [panes.experience]
+					},
+					{
+						id: 'mini-pane-row',
+						className: 'min-h-0 flex-[45]',
+						children: [
+							{
+								id: 'certifications-column',
+								className: 'min-w-0 flex-1',
+								panes: [panes.certifications]
+							},
+							{
+								id: 'spotify-column',
+								className: 'min-w-0 flex-1',
+								panes: [panes.spotify]
+							}
+						]
+					}
+				]
 			}
 		]
 	},
@@ -175,9 +216,21 @@ export const mobilePaneOrder: PaneMeta[] = [
 	panes.homelab,
 	panes.terminal,
 	panes.experience,
+	panes.certifications,
+	panes.spotify,
 	panes.about,
 	panes.skills
 ];
+
+function flattenColumns(columns: WorkspaceColumn[]): PaneMeta[] {
+	return columns.flatMap((column) => {
+		if (column.panes) {
+			return column.panes;
+		}
+
+		return flattenColumns(column.children ?? []);
+	});
+}
 
 export const shortcutToPaneId: Record<string, PaneId> = Object.fromEntries(
 	Object.values(panes).map((pane) => [pane.shortcut, pane.id])
@@ -185,9 +238,7 @@ export const shortcutToPaneId: Record<string, PaneId> = Object.fromEntries(
 
 const workspaceIdsByPane = new Map<PaneId, WorkspaceId>(
 	workspaces.flatMap((workspace) =>
-		workspace.columns.flatMap((column) =>
-			column.panes.map((pane) => [pane.id, workspace.id] as const)
-		)
+		flattenColumns(workspace.columns).map((pane) => [pane.id, workspace.id] as const)
 	)
 );
 
@@ -201,7 +252,7 @@ export function getWorkspaceById(workspaceId: WorkspaceId): WorkspaceMeta {
 
 export function getFirstPaneIdForWorkspace(workspaceId: WorkspaceId): PaneId | null {
 	const workspace = getWorkspaceById(workspaceId);
-	return workspace.columns[0]?.panes[0]?.id ?? null;
+	return flattenColumns(workspace.columns)[0]?.id ?? null;
 }
 
 const paneNeighbors: Record<PaneId, Partial<Record<Direction, PaneId>>> = {
@@ -234,7 +285,18 @@ const paneNeighbors: Record<PaneId, Partial<Record<Direction, PaneId>>> = {
 	},
 	experience: {
 		left: 'projects',
-		up: 'skills'
+		right: 'spotify',
+		up: 'skills',
+		down: 'certifications'
+	},
+	certifications: {
+		left: 'projects',
+		right: 'spotify',
+		up: 'experience'
+	},
+	spotify: {
+		left: 'certifications',
+		up: 'experience'
 	}
 };
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { RotateCw } from 'lucide-svelte';
+	import { ArrowRight } from 'lucide-svelte';
 
 	let { onCycle }: { onCycle: () => void } = $props();
 </script>
@@ -10,6 +10,6 @@
 	onclick={onCycle}
 	aria-label="Show next wallpaper"
 >
-	<RotateCw class="h-4 w-4" />
-	<span class="hidden xl:inline">next</span>
+	<ArrowRight class="h-4 w-4" />
+	<span class="hidden xl:inline">next wallpaper</span>
 </button>
