@@ -304,4 +304,3 @@ export const socialLinks = [
 		label: 'Download CV'
 	}
 ];
-// data fix

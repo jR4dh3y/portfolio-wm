@@ -92,4 +92,3 @@
 		</div>
 	</div>
 </article>
-// refactor project card

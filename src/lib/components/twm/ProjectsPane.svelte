@@ -1,0 +1,116 @@
+<script lang="ts">
+	import { projects } from '$lib/data';
+	import ProjectCard from '$lib/components/twm/projects/ProjectCard.svelte';
+	import ProjectDetailView from '$lib/components/twm/projects/ProjectDetailView.svelte';
+	import {
+		projectNavigationRequest,
+		navigateBack,
+		clearProjectNavigationRequest
+	} from '$lib/stores/project-navigation';
+	import type { PaneId } from '$lib/components/twm/layout';
+
+	let selectedProjectIndex = $state<number | null>(null);
+	let lastFocusedCardId = $state('');
+	let projectsListContainer = $state<HTMLDivElement | null>(null);
+	let projectsListScrollTop = $state(0);
+	let sourcePane = $state<PaneId>('projects');
+
+	let selectedProject = $derived(
+		selectedProjectIndex === null ? null : projects[selectedProjectIndex]
+	);
+
+	function toProjectSlug(value: string): string {
+		return value
+			.toLowerCase()
+			.trim()
+			.replace(/[^a-z0-9]+/g, '-')
+			.replace(/(^-|-$)+/g, '');
+	}
+
+	function openProject(index: number) {
+		projectsListScrollTop = projectsListContainer?.scrollTop ?? projectsListScrollTop;
+		lastFocusedCardId = `project-card-${index}`;
+		selectedProjectIndex = index;
+	}
+
+	function closeProject() {
+		const originSourcePane = sourcePane;
+		const focusedCardId = lastFocusedCardId;
+		selectedProjectIndex = null;
+		lastFocusedCardId = '';
+		sourcePane = 'projects';
+
+		// If we came from another pane, navigate back to it
+		if (originSourcePane !== 'projects') {
+			clearProjectNavigationRequest();
+			navigateBack(originSourcePane);
+			return;
+		}
+
+		requestAnimationFrame(() => {
+			if (projectsListContainer) {
+				projectsListContainer.scrollTop = projectsListScrollTop;
+			}
+		});
+
+		if (!focusedCardId) {
+			return;
+		}
+
+		requestAnimationFrame(() => {
+			document.getElementById(focusedCardId)?.focus({ preventScroll: true });
+		});
+	}
+
+	function handleProjectsListScroll(event: Event) {
+		projectsListScrollTop = (event.currentTarget as HTMLDivElement).scrollTop;
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key !== 'Escape' || selectedProjectIndex === null) {
+			return;
+		}
+
+		event.preventDefault();
+		closeProject();
+	}
+
+	$effect(() => {
+		const request = $projectNavigationRequest;
+		if (!request) {
+			return;
+		}
+
+		const nextIndex = projects.findIndex((project) => {
+			const projectSlug = project.slug ?? toProjectSlug(project.title);
+			return projectSlug === request.slug;
+		});
+
+		if (nextIndex === -1) {
+			clearProjectNavigationRequest();
+			return;
+		}
+
+		sourcePane = request.sourcePane ?? 'projects';
+		openProject(nextIndex);
+		clearProjectNavigationRequest();
+	});
+</script>
+
+<svelte:window onkeydown={handleKeydown} />
+
+{#if selectedProject}
+	<ProjectDetailView project={selectedProject} onBack={closeProject} />
+{:else}
+	<div
+		class="h-full w-full overflow-y-auto p-4 sm:p-8"
+		bind:this={projectsListContainer}
+		onscroll={handleProjectsListScroll}
+	>
+		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+			{#each projects as project, index (project.title)}
+				<ProjectCard {project} cardId={`project-card-${index}`} onOpen={() => openProject(index)} />
+			{/each}
+		</div>
+	</div>
+{/if}

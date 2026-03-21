@@ -29,4 +29,3 @@ export function clearProjectNavigationRequest() {
 export function clearReturnToPane() {
 	returnToPane.set(null);
 }
-// state tracking
