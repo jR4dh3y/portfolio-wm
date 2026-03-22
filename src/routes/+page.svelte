@@ -4,6 +4,7 @@
 	import { profile } from '$lib/data';
 	import BottomBar from '$lib/components/twm/BottomBar.svelte';
 	import SettingsModal from '$lib/components/twm/SettingsModal.svelte';
+	import CheatLoadingScreen from '$lib/components/twm/CheatLoadingScreen.svelte';
 	import TwmPane from '$lib/components/twm/TwmPane.svelte';
 	import {
 		projectPaneFocusRequest,
@@ -526,4 +527,6 @@
 		onCycleWallpaper={wallpaperState.cycleWallpaper}
 		onOpenSettings={handleOpenSettings}
 	/>
+
+	<CheatLoadingScreen />
 </main>
