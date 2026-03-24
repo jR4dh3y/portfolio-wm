@@ -14,7 +14,7 @@
 	let selectedProjectIndex = $state<number | null>(null);
 	let lastFocusedCardId = $state('');
 	let projectsListContainer = $state<HTMLDivElement | null>(null);
-	let projectsListScrollTop = $state(0);
+	let projectsListScrollTop = 0;
 	let sourcePane = $state<PaneId>('projects');
 
 	let selectedProject = $derived(
