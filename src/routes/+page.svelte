@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fromStore } from 'svelte/store';
 	import { onMount, untrack } from 'svelte';
 	import { profile } from '$lib/data';
 	import BottomBar from '$lib/components/twm/BottomBar.svelte';
@@ -12,22 +11,23 @@
 		returnToPane,
 		clearReturnToPane
 	} from '$lib/stores/project-navigation';
+	import MobileLanding from '$lib/components/MobileLanding.svelte';
 	import {
 		bottomBarAppletPlacements,
 		getFirstPaneIdForWorkspace,
 		getNeighborPaneId,
 		getWorkspaceById,
 		getWorkspaceIdForPane,
-		mobilePaneOrder,
 		shortcutToPaneId,
 		workspaces,
 		type Direction,
 		type PaneMeta,
 		type PaneId,
-		type WorkspaceMeta
+		type WorkspaceMeta,
+		type WorkspaceId
 	} from '$lib/components/twm/layout';
-	import { createWallpaperState } from '$lib/stores/wallpaper';
-	import { createSettingsState } from '$lib/stores/settings';
+	import { WallpaperState } from '$lib/stores/wallpaper.svelte';
+	import { SettingsState } from '$lib/stores/settings.svelte';
 	import type { PageData } from './$types';
 
 	const desktopViewportId = 'workspace-viewport';
@@ -58,49 +58,37 @@
 	let activePaneId = $state<PaneId>('hero');
 	let time = $state(new Date().toLocaleTimeString());
 	let scrollSyncFrame = 0;
-	const wallpaperState = createWallpaperState(untrack(() => data.bundledWallpapers));
-	const settingsState = createSettingsState();
-	const blurEnabled = fromStore(settingsState.blurEnabled);
-	const activeWallpaper = fromStore(wallpaperState.activeWallpaper);
-	const wallpaperModalOpen = fromStore(wallpaperState.modalOpen);
-	const wallpaperDraftUrl = fromStore(wallpaperState.draftUrl);
-	const wallpaperErrorMessage = fromStore(wallpaperState.errorMessage);
+	const initialIsMobile = untrack(() => data.isMobileRequest);
+	const wallpaperState = new WallpaperState(untrack(() => data.bundledWallpapers));
+	const settingsState = new SettingsState();
 	let activeWorkspaceId = $state<(typeof workspaceLayout)[number]['id']>('workspace-1');
 	let activeWorkspace = $derived(getWorkspaceById(activeWorkspaceId));
 
-	function isDesktopViewport(): boolean {
-		return typeof window !== 'undefined' && window.matchMedia('(min-width: 48rem)').matches;
-	}
+	let isDesktop = $state(
+		typeof window !== 'undefined'
+			? window.matchMedia('(min-width: 48rem)').matches
+			: !initialIsMobile
+	);
+	let prefersReducedMotion = $state(
+		typeof window !== 'undefined'
+			? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+			: false
+	);
 
 	function getScrollBehavior(): ScrollBehavior {
-		if (
-			typeof window !== 'undefined' &&
-			window.matchMedia('(prefers-reduced-motion: reduce)').matches
-		) {
-			return 'auto';
-		}
-
-		return 'smooth';
+		return prefersReducedMotion ? 'auto' : 'smooth';
 	}
 
 	function focusPane(paneId: PaneId, shouldFocus = true) {
 		activePaneId = paneId;
 		activeWorkspaceId = getWorkspaceIdForPane(paneId);
 
-		const behavior = getScrollBehavior();
-		const paneDomId = isDesktopViewport() ? paneId : `mobile-${paneId}`;
-		const pane = document.getElementById(`pane-${paneDomId}`);
-
-		if (!isDesktopViewport()) {
-			pane?.scrollIntoView({ behavior, block: 'nearest', inline: 'nearest' });
-
-			if (shouldFocus) {
-				pane?.focus({ preventScroll: true });
-			}
-
+		if (!isDesktop) {
 			return;
 		}
 
+		const behavior = getScrollBehavior();
+		const pane = document.getElementById(`pane-${paneId}`);
 		const workspace = document.getElementById(`workspace-${getWorkspaceIdForPane(paneId)}`);
 		const column = pane?.closest<HTMLElement>('[data-column-id]');
 
@@ -116,12 +104,7 @@
 	function focusWorkspace(workspaceId: (typeof workspaceLayout)[number]['id']) {
 		activeWorkspaceId = workspaceId;
 
-		if (!isDesktopViewport()) {
-			const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
-			if (firstPaneId) {
-				focusPane(firstPaneId, false);
-			}
-
+		if (!isDesktop) {
 			return;
 		}
 
@@ -155,7 +138,7 @@
 	}
 
 	function queueViewportSync() {
-		if (!isDesktopViewport()) {
+		if (!isDesktop) {
 			return;
 		}
 
@@ -164,6 +147,32 @@
 		}
 
 		scrollSyncFrame = requestAnimationFrame(syncActivePaneFromViewport);
+	}
+
+	let cachedWorkspaceElements: { id: WorkspaceId; element: HTMLElement }[] | null = null;
+	let cachedPanesByWorkspace: Record<string, HTMLElement[]> = {};
+
+	function getWorkspaceElements(): { id: WorkspaceId; element: HTMLElement }[] {
+		if (!cachedWorkspaceElements) {
+			const elements = workspaces.map((workspace) => ({
+				id: workspace.id,
+				element: document.getElementById(`workspace-${workspace.id}`)
+			}));
+			cachedWorkspaceElements = elements.filter(
+				(w): w is { id: WorkspaceId; element: HTMLElement } => w.element !== null
+			);
+		}
+		return cachedWorkspaceElements;
+	}
+
+	function getWorkspacePanes(workspaceId: string): HTMLElement[] {
+		if (!cachedPanesByWorkspace[workspaceId]) {
+			const panes = Array.from(
+				document.querySelectorAll<HTMLElement>(`#workspace-${workspaceId} [data-pane-id]`)
+			);
+			cachedPanesByWorkspace[workspaceId] = panes;
+		}
+		return cachedPanesByWorkspace[workspaceId];
 	}
 
 	function syncActivePaneFromViewport() {
@@ -177,22 +186,11 @@
 		const viewportRect = viewport.getBoundingClientRect();
 		const centerX = viewportRect.left + viewportRect.width / 2;
 		const centerY = viewportRect.top + viewportRect.height / 2;
-		const workspaceEntries = workspaces
-			.map((workspace) => {
-				const element = document.getElementById(`workspace-${workspace.id}`);
 
-				if (!element) {
-					return null;
-				}
-
-				const rect = element.getBoundingClientRect();
-
-				return {
-					id: workspace.id,
-					rect
-				};
-			})
-			.filter((entry) => entry !== null);
+		const workspaceEntries = getWorkspaceElements().map((w) => ({
+			id: w.id as (typeof workspaces)[number]['id'],
+			rect: w.element.getBoundingClientRect()
+		}));
 
 		let nearestWorkspaceId: (typeof workspaces)[number]['id'] | null = null;
 		let nearestWorkspaceScore = Number.POSITIVE_INFINITY;
@@ -213,10 +211,9 @@
 
 		let nearestPaneId: PaneId | null = null;
 		let nearestScore = Number.POSITIVE_INFINITY;
+		const targetWorkspaceId = nearestWorkspaceId ?? activeWorkspaceId;
 
-		for (const pane of document.querySelectorAll<HTMLElement>(
-			`#workspace-${nearestWorkspaceId ?? activeWorkspaceId} [data-pane-id]`
-		)) {
+		for (const pane of getWorkspacePanes(targetWorkspaceId)) {
 			const rect = pane.getBoundingClientRect();
 			if (rect.width === 0 || rect.height === 0) {
 				continue;
@@ -239,7 +236,7 @@
 	}
 
 	function handleKey(event: KeyboardEvent) {
-		if (wallpaperModalOpen.current) {
+		if (wallpaperState.modalOpen) {
 			if (event.key === 'Escape') {
 				event.preventDefault();
 				wallpaperState.closeModal();
@@ -254,7 +251,7 @@
 
 		if (event.key === '?') {
 			event.preventDefault();
-			if (wallpaperModalOpen.current) {
+			if (wallpaperState.modalOpen) {
 				wallpaperState.closeModal();
 			} else {
 				wallpaperState.openModal();
@@ -286,6 +283,14 @@
 	}
 
 	onMount(() => {
+		const desktopMq = window.matchMedia('(min-width: 48rem)');
+		const desktopHandler = (e: MediaQueryListEvent) => (isDesktop = e.matches);
+		desktopMq.addEventListener('change', desktopHandler);
+
+		const motionMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const motionHandler = (e: MediaQueryListEvent) => (prefersReducedMotion = e.matches);
+		motionMq.addEventListener('change', motionHandler);
+
 		const unsubscribeProjectPaneFocus = projectPaneFocusRequest.subscribe((nonce) => {
 			if (!nonce || typeof document === 'undefined') {
 				return;
@@ -304,19 +309,25 @@
 			focusPane(targetPane);
 		});
 
-		const interval = setInterval(() => {
+		let timeoutId: ReturnType<typeof setTimeout>;
+		function tickTime() {
 			time = new Date().toLocaleTimeString();
-		}, 1000);
+			const msToNextSecond = 1000 - new Date().getMilliseconds();
+			timeoutId = setTimeout(tickTime, msToNextSecond);
+		}
+		tickTime();
 
-		if (isDesktopViewport()) {
+		if (isDesktop) {
 			focusPane(activePaneId);
 			queueViewportSync();
 		}
 
 		return () => {
+			desktopMq.removeEventListener('change', desktopHandler);
+			motionMq.removeEventListener('change', motionHandler);
 			unsubscribeProjectPaneFocus();
 			unsubscribeReturnToPane();
-			clearInterval(interval);
+			clearTimeout(timeoutId);
 			cancelAnimationFrame(scrollSyncFrame);
 		};
 	});
@@ -382,15 +393,15 @@
 </svelte:head>
 
 <main
-	class="relative flex h-full w-full flex-col overflow-hidden bg-bg p-[var(--workspace-pane-gap)] font-mono text-fg antialiased md:h-screen md:max-h-screen {blurEnabled.current
+	class="relative flex h-full w-full flex-col overflow-hidden bg-bg p-[var(--workspace-pane-gap)] font-mono text-fg antialiased md:h-screen md:max-h-screen {settingsState.blurEnabled
 		? 'blur-enabled'
 		: ''}"
 >
-	{#if activeWallpaper.current}
+	{#if wallpaperState.activeWallpaper}
 		<div class="pointer-events-none absolute inset-0 hidden md:block">
 			<img
-				src={activeWallpaper.current.url}
-				alt={activeWallpaper.current.label}
+				src={wallpaperState.activeWallpaper.url}
+				alt={wallpaperState.activeWallpaper.label}
 				class="h-full w-full object-cover"
 				onerror={handleWallpaperError}
 			/>
@@ -398,11 +409,11 @@
 		</div>
 	{/if}
 
-	{#if wallpaperModalOpen.current}
+	{#if wallpaperState.modalOpen}
 		<SettingsModal
-			errorMessage={wallpaperErrorMessage.current}
-			inputValue={wallpaperDraftUrl.current}
-			blurEnabled={blurEnabled.current}
+			errorMessage={wallpaperState.errorMessage}
+			inputValue={wallpaperState.draftUrl}
+			blurEnabled={settingsState.blurEnabled}
 			onClose={wallpaperState.closeModal}
 			onInput={wallpaperState.updateDraftUrl}
 			onSave={wallpaperState.saveCustomWallpaper}
@@ -411,122 +422,110 @@
 	{/if}
 
 	<div class="relative z-10 flex flex-1 flex-col gap-[var(--workspace-pane-gap)] md:min-h-0">
-		<div class="grid grid-cols-1 gap-[var(--workspace-pane-gap)] md:hidden">
-			{#each mobilePaneOrder as pane (pane.id)}
-				{@const PaneComponent = pane.component}
-				<TwmPane
-					id={pane.id}
-					domId={`mobile-${pane.id}`}
-					trackPane={false}
-					title={pane.title}
-					shortcut={pane.shortcut}
-					className={pane.className ?? ''}
-					{activePaneId}
-					onFocus={handlePaneFocus}
-				>
-					<PaneComponent />
-				</TwmPane>
-			{/each}
-		</div>
-
-		<section class="hidden min-h-0 flex-1 overflow-hidden md:flex">
-			<div id={desktopViewportId} class="workspace-viewport flex-1" onscroll={queueViewportSync}>
-				{#each workspaceLayout as workspace (workspace.id)}
-					<section id={`workspace-${workspace.id}`} class="workspace-sheet">
-						<div
-							class="workspace-rail"
-							data-workspace-rail={workspace.id}
-							onscroll={queueViewportSync}
-						>
-							{#each workspace.columns as column (column.id)}
-								<div
-									class={`workspace-column ${column.className}`}
-									data-column-id={`${workspace.id}:${column.id}`}
-								>
-									{#if getColumnChildren(column).length}
-										{#each getColumnChildren(column) as child (child.id)}
-											<div
-												class={`workspace-column ${child.className}`}
-												data-column-id={`${workspace.id}:${child.id}`}
-											>
-												{#if getColumnChildren(child).length}
-													{#each getColumnChildren(child) as nested (nested.id)}
-														<div
-															class={`workspace-column ${nested.className}`}
-															data-column-id={`${workspace.id}:${nested.id}`}
-														>
-															{#each getColumnPanes(nested) as pane (pane.id)}
-																{@const PaneComponent = pane.component}
-																<TwmPane
-																	id={pane.id}
-																	domId={pane.id}
-																	title={pane.title}
-																	shortcut={pane.shortcut}
-																	className={pane.className ?? ''}
-																	{activePaneId}
-																	onFocus={handlePaneFocus}
-																>
-																	<PaneComponent />
-																</TwmPane>
-															{/each}
-														</div>
-													{/each}
-												{:else}
-													{#each getColumnPanes(child) as pane (pane.id)}
-														{@const PaneComponent = pane.component}
-														<TwmPane
-															id={pane.id}
-															domId={pane.id}
-															title={pane.title}
-															shortcut={pane.shortcut}
-															className={pane.className ?? ''}
-															{activePaneId}
-															onFocus={handlePaneFocus}
-														>
-															<PaneComponent />
-														</TwmPane>
-													{/each}
-												{/if}
-											</div>
-										{/each}
-									{:else}
-										{#each getColumnPanes(column) as pane (pane.id)}
-											{@const PaneComponent = pane.component}
-											<TwmPane
-												id={pane.id}
-												domId={pane.id}
-												title={pane.title}
-												shortcut={pane.shortcut}
-												className={pane.className ?? ''}
-												{activePaneId}
-												onFocus={handlePaneFocus}
-											>
-												<PaneComponent />
-											</TwmPane>
-										{/each}
-									{/if}
-								</div>
-							{/each}
-						</div>
-					</section>
-				{/each}
-			</div>
-		</section>
+		{#if !isDesktop}
+			<MobileLanding />
+		{:else}
+			<section class="hidden min-h-0 flex-1 overflow-hidden md:flex">
+				<div id={desktopViewportId} class="workspace-viewport flex-1" onscroll={queueViewportSync}>
+					{#each workspaceLayout as workspace (workspace.id)}
+						<section id={`workspace-${workspace.id}`} class="workspace-sheet">
+							<div
+								class="workspace-rail"
+								data-workspace-rail={workspace.id}
+								onscroll={queueViewportSync}
+							>
+								{#each workspace.columns as column (column.id)}
+									<div
+										class={`workspace-column ${column.className}`}
+										data-column-id={`${workspace.id}:${column.id}`}
+									>
+										{#if getColumnChildren(column).length}
+											{#each getColumnChildren(column) as child (child.id)}
+												<div
+													class={`workspace-column ${child.className}`}
+													data-column-id={`${workspace.id}:${child.id}`}
+												>
+													{#if getColumnChildren(child).length}
+														{#each getColumnChildren(child) as nested (nested.id)}
+															<div
+																class={`workspace-column ${nested.className}`}
+																data-column-id={`${workspace.id}:${nested.id}`}
+															>
+																{#each getColumnPanes(nested) as pane (pane.id)}
+																	{@const PaneComponent = pane.component}
+																	<TwmPane
+																		id={pane.id}
+																		domId={pane.id}
+																		title={pane.title}
+																		shortcut={pane.shortcut}
+																		className={pane.className ?? ''}
+																		{activePaneId}
+																		onFocus={handlePaneFocus}
+																	>
+																		<PaneComponent />
+																	</TwmPane>
+																{/each}
+															</div>
+														{/each}
+													{:else}
+														{#each getColumnPanes(child) as pane (pane.id)}
+															{@const PaneComponent = pane.component}
+															<TwmPane
+																id={pane.id}
+																domId={pane.id}
+																title={pane.title}
+																shortcut={pane.shortcut}
+																className={pane.className ?? ''}
+																{activePaneId}
+																onFocus={handlePaneFocus}
+															>
+																<PaneComponent />
+															</TwmPane>
+														{/each}
+													{/if}
+												</div>
+											{/each}
+										{:else}
+											{#each getColumnPanes(column) as pane (pane.id)}
+												{@const PaneComponent = pane.component}
+												<TwmPane
+													id={pane.id}
+													domId={pane.id}
+													title={pane.title}
+													shortcut={pane.shortcut}
+													className={pane.className ?? ''}
+													{activePaneId}
+													onFocus={handlePaneFocus}
+												>
+													<PaneComponent />
+												</TwmPane>
+											{/each}
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</section>
+					{/each}
+				</div>
+			</section>
+		{/if}
 	</div>
 
-	<BottomBar
-		name={profile.name}
-		lastName={profile.lastName}
-		onSelectWorkspace={handleWorkspaceAppletClick}
-		activeWorkspaceId={activeWorkspace.id}
-		activePaneId={isPaneFocused ? activePaneId : 'none'}
-		appletPlacements={bottomBarAppletPlacements}
-		{workspaces}
-		{time}
-		role={profile.role}
-		onCycleWallpaper={wallpaperState.cycleWallpaper}
-		onOpenSettings={handleOpenSettings}
-	/>
+	{#if isDesktop}
+		<BottomBar
+			name={profile.name}
+			lastName={profile.lastName}
+			onSelectWorkspace={handleWorkspaceAppletClick}
+			activeWorkspaceId={activeWorkspace.id}
+			activePaneId={isPaneFocused ? activePaneId : 'none'}
+			appletPlacements={bottomBarAppletPlacements}
+			{workspaces}
+			{time}
+			role={profile.role}
+			onCycleWallpaper={wallpaperState.cycleWallpaper}
+			onOpenSettings={handleOpenSettings}
+		/>
 
-	<CheatLoadingScreen />
+		<CheatLoadingScreen />
+	{/if}
 </main>

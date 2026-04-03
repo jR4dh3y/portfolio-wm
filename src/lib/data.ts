@@ -160,15 +160,14 @@ export const projects: Project[] = [
 		liveUrl: 'https://boxbox.radhey.dev/'
 	},
 	{
-		title: 'Pico32',
+		title: 'Victus Control (HPOmen-linux)',
 		desc: [
-			'Custom ESP32 wireless security firmware built around a serial TUI interface.',
-			'Implements WiFi reconnaissance, packet capture, protocol-level attacks, and BLE device enumeration; all optimized to run on bare ESP32 dev boards.'
+			'Linux-first control surface for HP Victus hardware with a GTK4 monitor window, GTK3 tray companion, and probe CLI.',
+			'Provides D-Bus-powered hardware profile switching (cool, quiet, balanced, performance), validated fan modes, and temperature-aware automation.'
 		],
-		image: 'https://raw.githubusercontent.com/jR4dh3y/Pico32/master/assets/ss.png',
-		tags: ['ESP32', 'C++', 'PlatformIO', 'IoT', 'Firmware', 'WiFi', 'BLE'],
-		liveUrl: 'https://pico32.radhey.dev',
-		githubUrl: 'https://github.com/jR4dh3y/Pico32'
+		image: '/assets/omenmon.png',
+		tags: ['Vala', 'GTK4', 'D-Bus', 'Linux', 'Meson', 'AppIndicator'],
+		githubUrl: 'https://github.com/jR4dh3y/HPOmen-linux'
 	},
 	{
 		title: 'Niri Dotfiles',
@@ -181,14 +180,15 @@ export const projects: Project[] = [
 		githubUrl: 'https://github.com/jR4dh3y/dots-niri'
 	},
 	{
-		title: 'Victus Control (HPOmen-linux)',
+		title: 'Pico32',
 		desc: [
-			'Linux-first control surface for HP Victus hardware with a GTK4 monitor window, GTK3 tray companion, and probe CLI.',
-			'Provides D-Bus-powered hardware profile switching (cool, quiet, balanced, performance), validated fan modes, and temperature-aware automation.'
+			'Custom ESP32 wireless security firmware built around a serial TUI interface.',
+			'Implements WiFi reconnaissance, packet capture, protocol-level attacks, and BLE device enumeration; all optimized to run on bare ESP32 dev boards.'
 		],
-		image: '/assets/omenmon.png',
-		tags: ['Vala', 'GTK4', 'D-Bus', 'Linux', 'Meson', 'AppIndicator'],
-		githubUrl: 'https://github.com/jR4dh3y/HPOmen-linux'
+		image: 'https://raw.githubusercontent.com/jR4dh3y/Pico32/master/assets/ss.png',
+		tags: ['ESP32', 'C++', 'PlatformIO', 'IoT', 'Firmware', 'WiFi', 'BLE'],
+		liveUrl: 'https://pico32.radhey.dev',
+		githubUrl: 'https://github.com/jR4dh3y/Pico32'
 	},
 	{
 		title: 'WallpyGui',

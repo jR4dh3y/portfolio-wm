@@ -45,7 +45,6 @@
 	}
 
 	html {
-		scroll-behavior: smooth;
 		height: 100%;
 	}
 
@@ -94,9 +93,7 @@
 		border: 1px solid var(--border);
 		transition:
 			border-color 0.2s ease,
-			background-color 0.3s ease,
-			-webkit-backdrop-filter 0.3s ease,
-			backdrop-filter 0.3s ease;
+			background-color 0.3s ease;
 	}
 
 	.blur-enabled .pane {

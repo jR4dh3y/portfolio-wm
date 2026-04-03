@@ -1,4 +1,4 @@
-import type { WallpaperSource } from '$lib/stores/wallpaper';
+import type { WallpaperSource } from '$lib/stores/wallpaper.svelte';
 
 const bundledFiles = ['lucy.jpeg', 'max.png', 'wal.jpg'] as const;
 

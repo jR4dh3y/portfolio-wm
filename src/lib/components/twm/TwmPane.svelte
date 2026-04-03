@@ -46,9 +46,10 @@
 			{/if}
 			~/{title}
 		</span>
-		{#if isActive}
-			<span class="animate-pulse">_</span>
-		{/if}
+		<span
+			class="transition-opacity duration-200 {isActive ? 'animate-pulse opacity-100' : 'opacity-0'}"
+			>_</span
+		>
 	</div>
 	<div class="flex-1 overflow-x-hidden overflow-y-auto">
 		{@render children()}

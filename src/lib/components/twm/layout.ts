@@ -209,18 +209,6 @@ export const bottomBarAppletPlacements: BottomBarAppletPlacement[] = [
 	{ id: 'time', zone: 'right', order: 4 }
 ];
 
-export const mobilePaneOrder: PaneMeta[] = [
-	panes.hero,
-	panes.projects,
-	panes.homelab,
-	panes.terminal,
-	panes.experience,
-	panes.certifications,
-	panes.spotify,
-	panes.about,
-	panes.skills
-];
-
 function flattenColumns(columns: WorkspaceColumn[]): PaneMeta[] {
 	return columns.flatMap((column) => {
 		if (column.panes) {
