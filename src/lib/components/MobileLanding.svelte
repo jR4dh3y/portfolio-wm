@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { profile, socialLinks, projects, experience, certifications, skills } from '$lib/data';
-	import { Download, Github, Linkedin, Mail, X, ExternalLink, Monitor } from 'lucide-svelte';
+	import {
+		Download,
+		Github,
+		Linkedin,
+		Mail,
+		X,
+		ExternalLink,
+		Monitor,
+		ChevronDown
+	} from 'lucide-svelte';
 
 	const iconMap: Record<string, typeof Github> = {
 		Github,
@@ -13,6 +22,8 @@
 	function getIcon(name: string) {
 		return iconMap[name] ?? ExternalLink;
 	}
+
+	let showMoreProjects = $state(false);
 </script>
 
 <div class="min-h-screen bg-bg text-fg">
@@ -104,8 +115,9 @@
 	<section class="border-t border-border p-6 sm:p-8">
 		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">Projects</h2>
 
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-			{#each projects as project (project.title)}
+		<!-- Featured Projects (first 4) -->
+		<div class="grid grid-cols-2 gap-3">
+			{#each projects.slice(0, 4) as project (project.title)}
 				<article class="flex flex-col overflow-hidden rounded-md border border-border bg-surface">
 					<img
 						src={project.image}
@@ -114,34 +126,30 @@
 						class="aspect-video w-full object-cover"
 					/>
 
-					<div class="flex flex-1 flex-col gap-3 p-4">
-						<h3 class="font-sans text-lg font-bold tracking-tight text-fg">
+					<div class="flex flex-1 flex-col gap-2 p-3">
+						<h3 class="text-sm font-bold tracking-tight text-fg">
 							{project.title}
 						</h3>
 
-						<p class="line-clamp-3 font-mono text-xs leading-relaxed text-dim">
-							{project.desc[0]}
-						</p>
-
-						<div class="mt-auto flex flex-col gap-3">
-							<div class="flex flex-wrap gap-1.5">
+						<div class="mt-auto flex flex-col gap-2">
+							<div class="flex flex-wrap gap-1">
 								{#each project.tags as tag (tag)}
 									<span
-										class="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[10px] text-accent"
+										class="rounded-sm border border-border px-1 py-0.5 font-mono text-[9px] text-accent"
 									>
 										{tag}
 									</span>
 								{/each}
 							</div>
 
-							<div class="flex items-center gap-2">
+							<div class="flex items-center gap-1.5">
 								<a
 									href={project.githubUrl}
 									target="_blank"
 									rel="noopener noreferrer"
-									class="inline-flex items-center gap-1.5 rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-dim transition-colors hover:border-fg hover:text-fg"
+									class="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-0.5 font-mono text-[10px] text-dim transition-colors hover:border-fg hover:text-fg"
 								>
-									<Github class="h-3.5 w-3.5" />
+									<Github class="h-3 w-3" />
 									Source
 								</a>
 								{#if project.liveUrl}
@@ -149,9 +157,9 @@
 										href={project.liveUrl}
 										target="_blank"
 										rel="noopener noreferrer"
-										class="inline-flex items-center gap-1.5 rounded-sm border border-highlight bg-highlight/10 px-2.5 py-1 font-mono text-[11px] text-highlight transition-colors hover:bg-highlight hover:text-black"
+										class="inline-flex items-center gap-1 rounded-sm border border-highlight bg-highlight/10 px-2 py-0.5 font-mono text-[10px] text-highlight transition-colors hover:bg-highlight hover:text-black"
 									>
-										<ExternalLink class="h-3.5 w-3.5" />
+										<ExternalLink class="h-3 w-3" />
 										Live
 									</a>
 								{/if}
@@ -161,6 +169,53 @@
 				</article>
 			{/each}
 		</div>
+
+		<!-- More Projects (remaining) -->
+		{#if projects.length > 4}
+			<div class="mt-4">
+				<button
+					onclick={() => (showMoreProjects = !showMoreProjects)}
+					class="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-surface px-4 py-2.5 font-mono text-xs text-dim transition-colors hover:border-fg hover:text-fg"
+				>
+					Show {projects.length - 4} more projects
+					<ChevronDown
+						class="h-4 w-4 transition-transform duration-200 {showMoreProjects ? 'rotate-180' : ''}"
+					/>
+				</button>
+
+				{#if showMoreProjects}
+					<div class="mt-3">
+						{#each projects.slice(4) as project (project.title)}
+							<div class="flex items-center justify-between border-b border-border py-3">
+								<span class="font-mono text-sm text-fg">{project.title}</span>
+								<div class="flex items-center gap-1.5">
+									<a
+										href={project.githubUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-0.5 font-mono text-[10px] text-dim transition-colors hover:border-fg hover:text-fg"
+									>
+										<Github class="h-3 w-3" />
+										Source
+									</a>
+									{#if project.liveUrl}
+										<a
+											href={project.liveUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="inline-flex items-center gap-1 rounded-sm border border-highlight bg-highlight/10 px-2 py-0.5 font-mono text-[10px] text-highlight transition-colors hover:bg-highlight hover:text-black"
+										>
+											<ExternalLink class="h-3 w-3" />
+											Live
+										</a>
+									{/if}
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		{/if}
 	</section>
 
 	<!-- Skills Section -->
