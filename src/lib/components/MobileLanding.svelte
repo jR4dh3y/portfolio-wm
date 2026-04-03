@@ -309,12 +309,6 @@
 					</a>
 				{/each}
 			</div>
-
-			<p class="font-mono text-[10px] text-dim">
-				&copy; {new Date().getFullYear()}
-				{profile.name}
-				{profile.lastName}
-			</p>
 		</div>
 	</footer>
 </div>
