@@ -2,14 +2,17 @@ import { redirect } from '@sveltejs/kit';
 import { getBundledWallpapers } from '$lib/server/wallpapers';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ request }) => {
-	const userAgent = request.headers.get('user-agent')?.toLowerCase() ?? '';
+const mobilePattern = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i;
 
-	if (userAgent.includes('curl')) {
+export const load: PageServerLoad = async ({ request }) => {
+	const userAgent = request.headers.get('user-agent') ?? '';
+
+	if (userAgent.toLowerCase().includes('curl')) {
 		throw redirect(307, '/terminal-profile');
 	}
 
 	return {
-		bundledWallpapers: getBundledWallpapers()
+		bundledWallpapers: getBundledWallpapers(),
+		isMobileRequest: mobilePattern.test(userAgent)
 	};
 };

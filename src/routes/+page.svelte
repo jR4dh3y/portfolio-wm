@@ -11,13 +11,13 @@
 		returnToPane,
 		clearReturnToPane
 	} from '$lib/stores/project-navigation';
+	import MobileLanding from '$lib/components/MobileLanding.svelte';
 	import {
 		bottomBarAppletPlacements,
 		getFirstPaneIdForWorkspace,
 		getNeighborPaneId,
 		getWorkspaceById,
 		getWorkspaceIdForPane,
-		mobilePaneOrder,
 		shortcutToPaneId,
 		workspaces,
 		type Direction,
@@ -58,23 +58,22 @@
 	let activePaneId = $state<PaneId>('hero');
 	let time = $state(new Date().toLocaleTimeString());
 	let scrollSyncFrame = 0;
+	const initialIsMobile = untrack(() => data.isMobileRequest);
 	const wallpaperState = new WallpaperState(untrack(() => data.bundledWallpapers));
 	const settingsState = new SettingsState();
 	let activeWorkspaceId = $state<(typeof workspaceLayout)[number]['id']>('workspace-1');
 	let activeWorkspace = $derived(getWorkspaceById(activeWorkspaceId));
 
 	let isDesktop = $state(
-		typeof window !== 'undefined' ? window.matchMedia('(min-width: 48rem)').matches : false
+		typeof window !== 'undefined'
+			? window.matchMedia('(min-width: 48rem)').matches
+			: !initialIsMobile
 	);
 	let prefersReducedMotion = $state(
 		typeof window !== 'undefined'
 			? window.matchMedia('(prefers-reduced-motion: reduce)').matches
 			: false
 	);
-
-	function isDesktopViewport(): boolean {
-		return isDesktop;
-	}
 
 	function getScrollBehavior(): ScrollBehavior {
 		return prefersReducedMotion ? 'auto' : 'smooth';
@@ -84,20 +83,12 @@
 		activePaneId = paneId;
 		activeWorkspaceId = getWorkspaceIdForPane(paneId);
 
-		const behavior = getScrollBehavior();
-		const paneDomId = isDesktopViewport() ? paneId : `mobile-${paneId}`;
-		const pane = document.getElementById(`pane-${paneDomId}`);
-
-		if (!isDesktopViewport()) {
-			pane?.scrollIntoView({ behavior, block: 'nearest', inline: 'nearest' });
-
-			if (shouldFocus) {
-				pane?.focus({ preventScroll: true });
-			}
-
+		if (!isDesktop) {
 			return;
 		}
 
+		const behavior = getScrollBehavior();
+		const pane = document.getElementById(`pane-${paneId}`);
 		const workspace = document.getElementById(`workspace-${getWorkspaceIdForPane(paneId)}`);
 		const column = pane?.closest<HTMLElement>('[data-column-id]');
 
@@ -113,12 +104,7 @@
 	function focusWorkspace(workspaceId: (typeof workspaceLayout)[number]['id']) {
 		activeWorkspaceId = workspaceId;
 
-		if (!isDesktopViewport()) {
-			const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
-			if (firstPaneId) {
-				focusPane(firstPaneId, false);
-			}
-
+		if (!isDesktop) {
 			return;
 		}
 
@@ -152,7 +138,7 @@
 	}
 
 	function queueViewportSync() {
-		if (!isDesktopViewport()) {
+		if (!isDesktop) {
 			return;
 		}
 
@@ -331,7 +317,7 @@
 		}
 		tickTime();
 
-		if (isDesktopViewport()) {
+		if (isDesktop) {
 			focusPane(activePaneId);
 			queueViewportSync();
 		}
@@ -437,23 +423,7 @@
 
 	<div class="relative z-10 flex flex-1 flex-col gap-[var(--workspace-pane-gap)] md:min-h-0">
 		{#if !isDesktop}
-			<div class="grid grid-cols-1 gap-[var(--workspace-pane-gap)] md:hidden">
-				{#each mobilePaneOrder as pane (pane.id)}
-					{@const PaneComponent = pane.component}
-					<TwmPane
-						id={pane.id}
-						domId={`mobile-${pane.id}`}
-						trackPane={false}
-						title={pane.title}
-						shortcut={pane.shortcut}
-						className={pane.className ?? ''}
-						{activePaneId}
-						onFocus={handlePaneFocus}
-					>
-						<PaneComponent />
-					</TwmPane>
-				{/each}
-			</div>
+			<MobileLanding />
 		{:else}
 			<section class="hidden min-h-0 flex-1 overflow-hidden md:flex">
 				<div id={desktopViewportId} class="workspace-viewport flex-1" onscroll={queueViewportSync}>
