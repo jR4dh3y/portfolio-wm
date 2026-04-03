@@ -186,9 +186,12 @@
 				{#if showMoreProjects}
 					<div class="mt-3">
 						{#each projects.slice(4) as project (project.title)}
-							<div class="flex items-center justify-between border-b border-border py-3">
-								<span class="font-mono text-sm text-fg">{project.title}</span>
-								<div class="flex items-center gap-1.5">
+							<div class="flex items-center justify-between gap-3 border-b border-border py-3">
+								<div class="min-w-0 flex-1">
+									<span class="font-mono text-sm text-fg">{project.title}</span>
+									<p class="truncate font-mono text-[11px] text-dim">{project.desc[0]}</p>
+								</div>
+								<div class="flex shrink-0 items-center gap-1.5">
 									<a
 										href={project.githubUrl}
 										target="_blank"
