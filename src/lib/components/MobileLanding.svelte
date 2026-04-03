@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { profile, socialLinks, projects, experience, certifications, skills } from '$lib/data';
-	import type { Project } from '$lib/data';
 	import { Download, Github, Linkedin, Mail, X, ExternalLink, Monitor } from 'lucide-svelte';
 
 	const iconMap: Record<string, typeof Github> = {
@@ -13,10 +12,6 @@
 
 	function getIcon(name: string) {
 		return iconMap[name] ?? ExternalLink;
-	}
-
-	function getProjectHref(project: Project): string {
-		return project.liveUrl ?? project.githubUrl;
 	}
 </script>
 
@@ -57,73 +52,6 @@
 					</a>
 				{/each}
 			</div>
-		</div>
-	</section>
-
-	<!-- About Section -->
-	<section class="border-t border-border p-6 sm:p-8">
-		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">About</h2>
-
-		<div class="flex flex-col gap-4">
-			{#each profile.about as paragraph, i (i)}
-				<p class="font-mono text-sm leading-relaxed text-dim">{paragraph}</p>
-			{/each}
-		</div>
-	</section>
-
-	<!-- Projects Section -->
-	<section class="border-t border-border p-6 sm:p-8">
-		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">Projects</h2>
-
-		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-			{#each projects as project (project.title)}
-				<article class="flex flex-col overflow-hidden rounded-md border border-border bg-surface">
-					<a href={getProjectHref(project)} target="_blank" rel="noopener noreferrer">
-						<img
-							src={project.image}
-							alt={project.title}
-							loading="lazy"
-							class="aspect-video w-full object-cover"
-						/>
-					</a>
-
-					<div class="flex flex-1 flex-col gap-3 p-4">
-						<div class="flex items-start justify-between gap-2">
-							<a
-								href={getProjectHref(project)}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="font-sans text-lg font-bold tracking-tight text-fg hover:text-highlight"
-							>
-								{project.title}
-							</a>
-							<a
-								href={project.githubUrl}
-								target="_blank"
-								rel="noopener noreferrer"
-								aria-label="GitHub - {project.title}"
-								class="shrink-0 text-dim transition-colors hover:text-fg"
-							>
-								<Github class="h-4 w-4" />
-							</a>
-						</div>
-
-						<p class="line-clamp-3 font-mono text-xs leading-relaxed text-dim">
-							{project.desc[0]}
-						</p>
-
-						<div class="mt-auto flex flex-wrap gap-1.5">
-							{#each project.tags as tag (tag)}
-								<span
-									class="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[10px] text-accent"
-								>
-									{tag}
-								</span>
-							{/each}
-						</div>
-					</div>
-				</article>
-			{/each}
 		</div>
 	</section>
 
@@ -168,6 +96,69 @@
 						</div>
 					{/if}
 				</div>
+			{/each}
+		</div>
+	</section>
+
+	<!-- Projects Section -->
+	<section class="border-t border-border p-6 sm:p-8">
+		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">Projects</h2>
+
+		<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+			{#each projects as project (project.title)}
+				<article class="flex flex-col overflow-hidden rounded-md border border-border bg-surface">
+					<img
+						src={project.image}
+						alt={project.title}
+						loading="lazy"
+						class="aspect-video w-full object-cover"
+					/>
+
+					<div class="flex flex-1 flex-col gap-3 p-4">
+						<h3 class="font-sans text-lg font-bold tracking-tight text-fg">
+							{project.title}
+						</h3>
+
+						<p class="line-clamp-3 font-mono text-xs leading-relaxed text-dim">
+							{project.desc[0]}
+						</p>
+
+						<div class="mt-auto flex flex-col gap-3">
+							<div class="flex flex-wrap gap-1.5">
+								{#each project.tags as tag (tag)}
+									<span
+										class="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[10px] text-accent"
+									>
+										{tag}
+									</span>
+								{/each}
+							</div>
+
+							<div class="flex items-center gap-2">
+								<a
+									href={project.githubUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="inline-flex items-center gap-1.5 rounded-sm border border-border px-2.5 py-1 font-mono text-[11px] text-dim transition-colors hover:border-fg hover:text-fg"
+								>
+									<Github class="h-3.5 w-3.5" />
+									Source
+								</a>
+								{#if project.liveUrl}
+									<a
+										href={project.liveUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="inline-flex items-center gap-1.5 rounded-sm border border-highlight bg-highlight/10 px-2.5 py-1 font-mono text-[11px] text-highlight transition-colors hover:bg-highlight hover:text-black"
+									>
+										<ExternalLink class="h-3.5 w-3.5" />
+										Live
+									</a>
+								{/if}
+							</div>
+						</div>
+					</div>
+				</article>
 			{/each}
 		</div>
 	</section>
@@ -223,6 +214,17 @@
 						</a>
 					{/if}
 				</div>
+			{/each}
+		</div>
+	</section>
+
+	<!-- About Section -->
+	<section class="border-t border-border p-6 sm:p-8">
+		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">About</h2>
+
+		<div class="flex flex-col gap-4">
+			{#each profile.about as paragraph, i (i)}
+				<p class="font-mono text-sm leading-relaxed text-dim">{paragraph}</p>
 			{/each}
 		</div>
 	</section>

@@ -511,19 +511,21 @@
 		{/if}
 	</div>
 
-	<BottomBar
-		name={profile.name}
-		lastName={profile.lastName}
-		onSelectWorkspace={handleWorkspaceAppletClick}
-		activeWorkspaceId={activeWorkspace.id}
-		activePaneId={isPaneFocused ? activePaneId : 'none'}
-		appletPlacements={bottomBarAppletPlacements}
-		{workspaces}
-		{time}
-		role={profile.role}
-		onCycleWallpaper={wallpaperState.cycleWallpaper}
-		onOpenSettings={handleOpenSettings}
-	/>
+	{#if isDesktop}
+		<BottomBar
+			name={profile.name}
+			lastName={profile.lastName}
+			onSelectWorkspace={handleWorkspaceAppletClick}
+			activeWorkspaceId={activeWorkspace.id}
+			activePaneId={isPaneFocused ? activePaneId : 'none'}
+			appletPlacements={bottomBarAppletPlacements}
+			{workspaces}
+			{time}
+			role={profile.role}
+			onCycleWallpaper={wallpaperState.cycleWallpaper}
+			onOpenSettings={handleOpenSettings}
+		/>
 
-	<CheatLoadingScreen />
+		<CheatLoadingScreen />
+	{/if}
 </main>
