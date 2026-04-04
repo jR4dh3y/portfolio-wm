@@ -21,6 +21,7 @@
 		activeWorkspaceId,
 		onSelectWorkspace,
 		onCycleWallpaper,
+		isWallpaperLoading,
 		onOpenSettings
 	}: {
 		name: string;
@@ -32,7 +33,8 @@
 		appletPlacements: BottomBarAppletPlacement[];
 		activeWorkspaceId: WorkspaceId;
 		onSelectWorkspace: (workspaceId: WorkspaceId) => void;
-		onCycleWallpaper: () => void;
+		onCycleWallpaper: () => void | Promise<void>;
+		isWallpaperLoading: boolean;
 		onOpenSettings: () => void;
 	} = $props();
 
@@ -83,7 +85,7 @@
 			{/each}
 		</div>
 	{:else if appletId === 'wallpaper'}
-		<WallpaperApplet onCycle={onCycleWallpaper} />
+		<WallpaperApplet onCycle={onCycleWallpaper} isLoading={isWallpaperLoading} />
 	{:else if appletId === 'settings'}
 		<SettingsApplet {onOpenSettings} />
 	{:else if appletId === 'time'}

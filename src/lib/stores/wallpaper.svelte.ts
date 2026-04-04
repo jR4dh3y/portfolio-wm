@@ -78,6 +78,7 @@ export class WallpaperState {
 	modalOpen = $state(false);
 	draftUrl = $state('');
 	errorMessage = $state('');
+	isCycling = $state(false);
 
 	constructor(bundledWallpapers: WallpaperSource[]) {
 		this.bundledWallpapers = bundledWallpapers;
@@ -132,7 +133,25 @@ export class WallpaperState {
 		this.persist();
 	}
 
-	cycleWallpaper = () => {
+	private preloadWallpaper(url: string) {
+		if (!browser) {
+			return Promise.resolve();
+		}
+
+		return new Promise<void>((resolve, reject) => {
+			const image = new Image();
+
+			image.onload = () => resolve();
+			image.onerror = () => reject(new Error('Unable to load wallpaper.'));
+			image.src = url;
+		});
+	}
+
+	cycleWallpaper = async () => {
+		if (this.isCycling) {
+			return;
+		}
+
 		const availableWallpapers = this.sources;
 		if (availableWallpapers.length === 0) {
 			return;
@@ -143,9 +162,21 @@ export class WallpaperState {
 			(wallpaper) => wallpaper.id === currentActiveId
 		);
 		const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % availableWallpapers.length;
+		const nextWallpaper = availableWallpapers[nextIndex] ?? availableWallpapers[0] ?? null;
 
-		this.activeId = availableWallpapers[nextIndex]?.id ?? availableWallpapers[0]?.id ?? null;
-		this.persist();
+		if (!nextWallpaper) {
+			return;
+		}
+
+		this.isCycling = true;
+
+		try {
+			await this.preloadWallpaper(nextWallpaper.url);
+			this.activeId = nextWallpaper.id;
+			this.persist();
+		} finally {
+			this.isCycling = false;
+		}
 	};
 
 	openModal = () => {
