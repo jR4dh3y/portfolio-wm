@@ -522,6 +522,7 @@
 			{workspaces}
 			{time}
 			role={profile.role}
+			isWallpaperLoading={wallpaperState.isCycling}
 			onCycleWallpaper={wallpaperState.cycleWallpaper}
 			onOpenSettings={handleOpenSettings}
 		/>

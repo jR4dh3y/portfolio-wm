@@ -18,7 +18,7 @@ export const experience = [
 		role: 'Cloud Lead',
 		period: 'Aug 2025 - Present',
 		description:
-			'Led cloud learning initiatives by organizing hands-on workshops focused on Google Cloud technologies.\nBuilt and maintained a tutorial website hosting video walkthroughs of Google Cloud Study Jam labs along with detailed notes to help students complete skill badges.',
+			'Led cloud learning initiatives through hands-on Google Cloud workshops and guided sessions for 100+ students. Built and maintained a tutorial platform with 20+ lab walkthroughs, notes, and video resources for Google Cloud Study Jam completion.',
 		skills: ['GCP', 'TypeScript', 'Linux', 'Docker', 'Terraform'],
 		links: [
 			{ label: 'Tutorial Website', href: 'https://gcp-tutorial.vercel.app' },

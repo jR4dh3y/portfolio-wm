@@ -26,7 +26,7 @@
 	let showMoreProjects = $state(false);
 </script>
 
-<div class="min-h-screen bg-bg text-fg">
+<div class="min-h-screen overflow-x-hidden bg-bg text-fg">
 	<!-- Hero Section -->
 	<section class="relative flex min-h-[70vh] flex-col justify-end overflow-hidden p-6 sm:p-8">
 		<div class="absolute inset-0 z-0">
@@ -40,12 +40,16 @@
 		</div>
 
 		<div class="relative z-10 flex flex-col gap-4">
-			<h1 class="text-6xl font-black tracking-tighter sm:text-7xl">
+			<h1
+				class="max-w-full text-[clamp(2.2rem,11vw,3.9rem)] leading-[0.92] font-black tracking-tight sm:text-7xl sm:tracking-tighter"
+			>
 				{profile.name}<br />
 				<span class="text-accent">{profile.lastName}</span>
 			</h1>
 
-			<p class="max-w-md font-mono text-sm leading-relaxed text-dim sm:text-base">
+			<p
+				class="max-w-full font-mono text-sm leading-relaxed break-words text-dim sm:max-w-md sm:text-base"
+			>
 				{profile.tagline}
 			</p>
 
@@ -68,16 +72,22 @@
 
 	<!-- Experience Section -->
 	<section class="border-t border-border p-6 sm:p-8">
-		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">Experience</h2>
+		<h2
+			class="mx-auto mb-6 w-full max-w-[calc(100vw-3rem)] px-2 text-center text-[clamp(1.3rem,7vw,2rem)] leading-none font-black tracking-tight text-accent sm:text-4xl sm:tracking-tighter"
+		>
+			Experience
+		</h2>
 
 		<div class="flex flex-col gap-6">
 			{#each experience as exp (exp.company + exp.role)}
 				<div class="border-l-2 border-highlight pl-4">
-					<h3 class="font-sans text-lg font-bold tracking-tight text-fg">{exp.role}</h3>
-					<p class="font-mono text-sm text-accent">{exp.company}</p>
+					<h3 class="font-sans text-lg font-bold tracking-tight break-words text-fg">{exp.role}</h3>
+					<p class="font-mono text-sm break-words text-accent">{exp.company}</p>
 					<p class="mt-1 font-mono text-xs text-dim">{exp.period}</p>
 
-					<p class="mt-3 font-mono text-xs leading-relaxed whitespace-pre-line text-dim">
+					<p
+						class="mt-3 font-mono text-xs leading-relaxed break-words whitespace-pre-line text-dim"
+					>
 						{exp.description}
 					</p>
 
@@ -113,7 +123,11 @@
 
 	<!-- Projects Section -->
 	<section class="border-t border-border p-6 sm:p-8">
-		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">Projects</h2>
+		<h2
+			class="mb-6 max-w-full text-[clamp(1.55rem,8vw,2.4rem)] leading-none font-black tracking-tight text-accent sm:text-4xl sm:tracking-tighter"
+		>
+			Projects
+		</h2>
 
 		<!-- Featured Projects (first 4) -->
 		<div class="grid grid-cols-2 gap-3">
@@ -223,7 +237,11 @@
 
 	<!-- Skills Section -->
 	<section class="border-t border-border p-6 sm:p-8">
-		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">Skills</h2>
+		<h2
+			class="mb-6 max-w-full text-[clamp(1.55rem,8vw,2.4rem)] leading-none font-black tracking-tight text-accent sm:text-4xl sm:tracking-tighter"
+		>
+			Skills
+		</h2>
 
 		<div class="flex flex-col gap-5">
 			{#each skills as group (group.title)}
@@ -247,17 +265,19 @@
 
 	<!-- Certifications Section -->
 	<section class="border-t border-border p-6 sm:p-8">
-		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">
+		<h2
+			class="mx-auto mb-6 w-full max-w-[calc(100vw-3rem)] px-2 text-center text-[clamp(1.05rem,5.8vw,1.7rem)] leading-none font-black tracking-tight text-accent sm:text-4xl sm:tracking-tighter"
+		>
 			Certifications
 		</h2>
 
 		<div class="flex flex-col gap-3">
 			{#each certifications as cert (cert.title)}
 				<div
-					class="flex items-center justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3"
+					class="flex items-start justify-between gap-3 rounded-md border border-border bg-surface px-4 py-3"
 				>
 					<div class="min-w-0">
-						<p class="truncate font-mono text-sm font-medium text-fg">{cert.title}</p>
+						<p class="font-mono text-sm font-medium break-words text-fg">{cert.title}</p>
 						<p class="font-mono text-xs text-dim">{cert.issuer}</p>
 					</div>
 					{#if cert.href}
@@ -278,11 +298,15 @@
 
 	<!-- About Section -->
 	<section class="border-t border-border p-6 sm:p-8">
-		<h2 class="mb-6 text-3xl font-black tracking-tighter text-accent sm:text-4xl">About</h2>
+		<h2
+			class="mb-6 max-w-full text-[clamp(1.55rem,8vw,2.4rem)] leading-none font-black tracking-tight text-accent sm:text-4xl sm:tracking-tighter"
+		>
+			About
+		</h2>
 
 		<div class="flex flex-col gap-4">
 			{#each profile.about as paragraph, i (i)}
-				<p class="font-mono text-sm leading-relaxed text-dim">{paragraph}</p>
+				<p class="font-mono text-sm leading-relaxed break-words text-dim">{paragraph}</p>
 			{/each}
 		</div>
 	</section>
@@ -290,9 +314,9 @@
 	<!-- Footer -->
 	<footer class="border-t border-border p-6 sm:p-8">
 		<div class="flex flex-col items-center gap-4 text-center">
-			<div class="flex items-center gap-2 text-dim">
+			<div class="flex flex-wrap items-center justify-center gap-2 text-dim">
 				<Monitor class="h-4 w-4" />
-				<p class="font-mono text-xs">Best experienced on desktop</p>
+				<p class="font-mono text-xs">Visit on PC for a window-manager-like experience.</p>
 			</div>
 
 			<div class="flex flex-wrap justify-center gap-3">
