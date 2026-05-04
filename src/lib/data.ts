@@ -156,11 +156,13 @@ export const projects: Project[] = [
 	{
 		title: 'FBS: Fast Blob Storage',
 		desc: [
-			'S3-compatible blob storage and CDN solution for single node deployment primarily for self-hosting. Built with Go for high performance and low resource usage, designed to be a simple, efficient, and cost-effective alternative to traditional cloud storage services.'
+			'S3-compatible blob storage and CDN solution for single node deployment primarily for self-hosting.',
+			'Built with Go for high performance and low resource usage, designed to be a simple, efficient, and cost-effective alternative to traditional cloud storage services.'
 		],
-		image: 'https://raw.githubusercontent.com/jR4dh3y/fbs/refs/heads/main/assets/ss.png',
-		tags: ['Go', 'S3 API', 'CDN', 'Docker'],
-		githubUrl: ''
+		image: '/assets/fbs.png',
+		tags: ['Go', 'S3', 'CDN', 'Docker', 'Self-Hosting', 'SQlight'],
+		githubUrl: 'https://github.com/i-got-this-faa/fbs-core',
+		liveUrl: 'https://fbs-landing.vercel.app/'
 	},
 	{
 		title: 'BoxBox',
