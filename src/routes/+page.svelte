@@ -146,11 +146,10 @@
 			cancelAnimationFrame(scrollSyncFrame);
 		}
 
-		scrollSyncFrame = requestAnimationFrame(syncActivePaneFromViewport);
+		scrollSyncFrame = requestAnimationFrame(syncActiveWorkspaceFromViewport);
 	}
 
 	let cachedWorkspaceElements: { id: WorkspaceId; element: HTMLElement }[] | null = null;
-	let cachedPanesByWorkspace: Record<string, HTMLElement[]> = {};
 
 	function getWorkspaceElements(): { id: WorkspaceId; element: HTMLElement }[] {
 		if (!cachedWorkspaceElements) {
@@ -165,17 +164,7 @@
 		return cachedWorkspaceElements;
 	}
 
-	function getWorkspacePanes(workspaceId: string): HTMLElement[] {
-		if (!cachedPanesByWorkspace[workspaceId]) {
-			const panes = Array.from(
-				document.querySelectorAll<HTMLElement>(`#workspace-${workspaceId} [data-pane-id]`)
-			);
-			cachedPanesByWorkspace[workspaceId] = panes;
-		}
-		return cachedPanesByWorkspace[workspaceId];
-	}
-
-	function syncActivePaneFromViewport() {
+	function syncActiveWorkspaceFromViewport() {
 		scrollSyncFrame = 0;
 
 		const viewport = document.getElementById(desktopViewportId);
@@ -184,7 +173,6 @@
 		}
 
 		const viewportRect = viewport.getBoundingClientRect();
-		const centerX = viewportRect.left + viewportRect.width / 2;
 		const centerY = viewportRect.top + viewportRect.height / 2;
 
 		const workspaceEntries = getWorkspaceElements().map((w) => ({
@@ -207,31 +195,6 @@
 
 		if (nearestWorkspaceId) {
 			activeWorkspaceId = nearestWorkspaceId;
-		}
-
-		let nearestPaneId: PaneId | null = null;
-		let nearestScore = Number.POSITIVE_INFINITY;
-		const targetWorkspaceId = nearestWorkspaceId ?? activeWorkspaceId;
-
-		for (const pane of getWorkspacePanes(targetWorkspaceId)) {
-			const rect = pane.getBoundingClientRect();
-			if (rect.width === 0 || rect.height === 0) {
-				continue;
-			}
-
-			const deltaX = rect.left + rect.width / 2 - centerX;
-			const deltaY = rect.top + rect.height / 2 - centerY;
-			const score = deltaX ** 2 + deltaY ** 2;
-			const paneId = pane.dataset.paneId as PaneId | undefined;
-
-			if (paneId && score < nearestScore) {
-				nearestScore = score;
-				nearestPaneId = paneId;
-			}
-		}
-
-		if (nearestPaneId) {
-			activePaneId = nearestPaneId;
 		}
 	}
 
@@ -332,8 +295,11 @@
 		};
 	});
 
-	function handlePaneFocus(paneId: string) {
-		activePaneId = paneId as PaneId;
+	function handlePaneActivate(paneId: string) {
+		const nextPaneId = paneId as PaneId;
+		activePaneId = nextPaneId;
+		activeWorkspaceId = getWorkspaceIdForPane(nextPaneId);
+		isPaneFocused = true;
 	}
 
 	function handleWorkspaceAppletClick(workspaceId: (typeof workspaceLayout)[number]['id']) {
@@ -460,7 +426,7 @@
 																		shortcut={pane.shortcut}
 																		className={pane.className ?? ''}
 																		{activePaneId}
-																		onFocus={handlePaneFocus}
+																		onActivate={handlePaneActivate}
 																	>
 																		<PaneComponent />
 																	</TwmPane>
@@ -477,7 +443,7 @@
 																shortcut={pane.shortcut}
 																className={pane.className ?? ''}
 																{activePaneId}
-																onFocus={handlePaneFocus}
+																onActivate={handlePaneActivate}
 															>
 																<PaneComponent />
 															</TwmPane>
@@ -495,7 +461,7 @@
 													shortcut={pane.shortcut}
 													className={pane.className ?? ''}
 													{activePaneId}
-													onFocus={handlePaneFocus}
+													onActivate={handlePaneActivate}
 												>
 													<PaneComponent />
 												</TwmPane>

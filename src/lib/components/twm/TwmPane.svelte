@@ -9,7 +9,7 @@
 		shortcut = '',
 		className = '',
 		activePaneId,
-		onFocus,
+		onActivate,
 		children
 	}: {
 		id: string;
@@ -19,11 +19,19 @@
 		shortcut?: string;
 		className?: string;
 		activePaneId: string;
-		onFocus: (id: string) => void;
+		onActivate: (id: string) => void;
 		children: Snippet;
 	} = $props();
 
 	let isActive = $derived(activePaneId === id);
+
+	function handlePointerDown(event: PointerEvent) {
+		onActivate(id);
+
+		if (event.currentTarget instanceof HTMLElement) {
+			event.currentTarget.focus({ preventScroll: true });
+		}
+	}
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
@@ -32,7 +40,8 @@
 	data-pane-id={trackPane ? id : undefined}
 	class="pane flex h-full min-h-0 w-full min-w-0 snap-start flex-col overflow-hidden outline-none {className}"
 	tabindex={isActive ? 0 : -1}
-	onfocusin={() => onFocus(id)}
+	onfocusin={() => onActivate(id)}
+	onpointerdowncapture={handlePointerDown}
 	role="region"
 	aria-labelledby={`pane-title-${domId}`}
 >

@@ -46,6 +46,12 @@ export type Certification = {
 
 export const certifications: Certification[] = [
 	{
+		title: 'Palo Alto Networks Cybersecurity',
+		issuer: 'Palo Alto',
+		issued: 'Credential',
+		href: 'https://drive.google.com/file/d/1ArLaJyIQP2R-S94KwshJRTgIQdjc3UCm/view?usp=sharing'
+	},
+	{
 		title: 'Google Cybersecurity',
 		issuer: 'Google',
 		issued: 'Credential',
@@ -146,6 +152,15 @@ export const projects: Project[] = [
 		tags: ['Python', 'PyTorch', 'U-Net', 'Transformer', 'Audio DSP', 'DL'],
 		githubUrl: 'https://github.com/jR4dh3y/unet-audiofilter',
 		buttonTheme: 'dark'
+	},
+	{
+		title: 'FBS: Fast Blob Storage',
+		desc: [
+			'S3-compatible blob storage and CDN solution for single node deployment primarily for self-hosting. Built with Go for high performance and low resource usage, designed to be a simple, efficient, and cost-effective alternative to traditional cloud storage services.'
+		],
+		image: 'https://raw.githubusercontent.com/jR4dh3y/fbs/refs/heads/main/assets/ss.png',
+		tags: ['Go', 'S3 API', 'CDN', 'Docker'],
+		githubUrl: ''
 	},
 	{
 		title: 'BoxBox',
