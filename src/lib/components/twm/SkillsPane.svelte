@@ -1,41 +1,85 @@
 <script lang="ts">
 	import { skills } from '$lib/data';
 
-	function toCommandName(title: string): string {
-		return title
+	type TokenKind = 'comment' | 'keyword' | 'variable' | 'string' | 'punctuation' | 'decorator';
+	type Token = { text: string; kind: TokenKind };
+
+	const kindClasses: Record<TokenKind, string> = {
+		comment: 'text-dim',
+		keyword: 'text-highlight',
+		variable: 'text-accent',
+		string: 'text-fg/90',
+		punctuation: 'text-dim/70',
+		decorator: 'text-caution'
+	};
+
+	const t = (text: string, kind: TokenKind): Token => ({ text, kind });
+
+	const toPythonVar = (title: string) =>
+		title
 			.toLowerCase()
 			.replaceAll('&', 'and')
-			.replaceAll(/[^a-z0-9]+/g, '-')
-			.replaceAll(/(^-|-$)+/g, '');
-	}
+			.replaceAll(/[^a-z0-9]+/g, '_')
+			.replaceAll(/^_+|_+$/g, '');
+
+	const MAX_SKILLS_PER_LINE = 6;
+
+	const lines: Token[][] = [
+		[],
+		...skills.flatMap((group) => {
+			const comment: Token[] = [t(`# ${group.title}`, 'comment')];
+			const chunks: Token[][] = [];
+			const varName = toPythonVar(group.title);
+			const indent = ' '.repeat(varName.length + ' = ['.length);
+
+			for (let i = 0; i < group.skills.length; i += MAX_SKILLS_PER_LINE) {
+				const slice = group.skills.slice(i, i + MAX_SKILLS_PER_LINE);
+				const isFirst = i === 0;
+				const isLast = i + MAX_SKILLS_PER_LINE >= group.skills.length;
+				const line: Token[] = [];
+
+				if (isFirst) {
+					line.push(t(varName, 'variable'));
+					line.push(t(' = ', 'punctuation'));
+					line.push(t('[', 'keyword'));
+				} else {
+					line.push(t(indent, 'punctuation'));
+				}
+
+				slice.forEach((entry, si) => {
+					line.push(t(`'${entry.name}'`, 'string'));
+					if (!(isLast && si === slice.length - 1)) {
+						line.push(t(', ', 'punctuation'));
+					}
+				});
+
+				if (isLast) {
+					line.push(t(']', 'keyword'));
+				}
+
+				chunks.push(line);
+			}
+
+			return [comment, ...chunks];
+		})
+	];
 </script>
 
-<div class="h-full min-h-0 w-full overflow-hidden bg-bg/25 p-2 sm:p-3">
-	<div class="grid h-full min-h-0 grid-cols-1 gap-2 sm:grid-cols-2">
-		{#each skills as group (group.title)}
-			<section class="min-h-0 overflow-hidden border border-highlight/70 bg-surface/25 p-3">
-				<div class="flex h-full min-h-0 flex-col gap-3">
-					<div class="flex shrink-0 items-center gap-2.5">
-						<h3 class="font-mono text-sm font-bold tracking-[0.14em] text-fg uppercase">
-							./{toCommandName(group.title)}
-						</h3>
-						<span class="h-px min-w-4 flex-1 bg-highlight/70"></span>
+<div class="flex h-full w-full flex-col overflow-hidden">
+	<div class="min-h-0 flex-1 border border-border/70 bg-bg/40">
+		<div class="font-mono text-[13px] leading-[1.65]">
+			<div class="grid grid-cols-[3rem_minmax(0,1fr)]">
+				{#each lines as lineTokens, index (`line-${index}`)}
+					<div class="border-r border-border/70 pr-2 text-right text-dim/50 select-none">
+						{index + 1}
 					</div>
-
-					<div
-						class="flex min-h-0 flex-1 flex-wrap content-start items-baseline gap-x-2 gap-y-2 overflow-hidden"
-					>
-						{#each group.skills as skill, skillIndex (skill.name)}
-							<span class="font-mono text-sm whitespace-nowrap text-fg/85">
-								{skill.name}
-							</span>
-							{#if skillIndex < group.skills.length - 1}
-								<span class="font-mono text-xs text-dim/45" aria-hidden="true">/</span>
-							{/if}
+					<div class="pl-3 whitespace-pre">
+						{#each lineTokens as tok, ti (`tok-${index}-${ti}`)}
+							<span class={kindClasses[tok.kind]}>{tok.text}</span>
 						{/each}
 					</div>
-				</div>
-			</section>
-		{/each}
+				{/each}
+			</div>
+		</div>
 	</div>
 </div>

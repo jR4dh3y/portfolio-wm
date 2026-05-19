@@ -334,6 +334,9 @@ export const skills = [
 			{ name: 'Rust' },
 			{ name: 'SQL' },
 			{ name: 'Lua' },
+			{ name: 'QML' },
+			{ name: 'Bash' },
+			{ name: 'PowerShell' },
 			{ name: 'LaTeX' }
 		]
 	},
@@ -344,8 +347,8 @@ export const skills = [
 			{ name: 'SvelteKit' },
 			{ name: 'Astro' },
 			{ name: 'Expo' },
-			{ name: 'Tailwind' },
-			{ name: 'QML' }
+			{ name: 'Express' },
+			{ name: 'Tailwind' }
 		]
 	},
 	{
@@ -360,39 +363,24 @@ export const skills = [
 		]
 	},
 	{
-		title: 'Databases & Backend',
-		skills: [
-			{ name: 'ConvexDB' },
-			{ name: 'PostgreSQL' },
-			{ name: 'MySQL' },
-			{ name: 'Redis' },
-			{ name: 'Express' },
-			{ name: 'Node.js' },
-			{ name: 'Bun' }
-		]
+		title: 'Databases',
+		skills: [{ name: 'ConvexDB' }, { name: 'PostgreSQL' }, { name: 'MySQL' }, { name: 'Redis' }]
 	},
 	{
-		title: 'DevOps & Cloud',
-		skills: [
-			{ name: 'Git' },
-			{ name: 'Docker' },
-			{ name: 'CMake' },
-			{ name: 'Cloudflare' },
-			{ name: 'Vercel' },
-			{ name: 'AWS' },
-			{ name: 'GCP' },
-			{ name: 'Kubernetes' }
-		]
+		title: 'Tooling',
+		skills: [{ name: 'Node.js' }, { name: 'Bun' }, { name: 'CMake' }]
 	},
 	{
-		title: 'Systems & OS',
-		skills: [
-			{ name: 'Linux' },
-			{ name: 'Windows' },
-			{ name: 'PowerShell' },
-			{ name: 'Bash' },
-			{ name: 'Networking' }
-		]
+		title: 'Cloud',
+		skills: [{ name: 'AWS' }, { name: 'GCP' }, { name: 'Cloudflare' }, { name: 'Vercel' }]
+	},
+	{
+		title: 'DevOps',
+		skills: [{ name: 'Git' }, { name: 'Docker' }, { name: 'Kubernetes' }]
+	},
+	{
+		title: 'Systems',
+		skills: [{ name: 'Linux' }, { name: 'Windows' }, { name: 'Networking' }]
 	}
 ];
 
