@@ -198,6 +198,17 @@ export const projects: Project[] = [
 		liveUrl: 'https://boxbox.radhey.dev/'
 	},
 	{
+		title: 'QckPages',
+		desc: [
+			'HTML hosting app for turning a single .html file into a shareable public link in seconds.',
+			'Built with SvelteKit, Convex, Better Auth, FBS-backed file storage, and Razorpay-powered Pro billing for unlimited published pages.'
+		],
+		image: '/assets/qckpages.png',
+		tags: ['SvelteKit', 'Convex', 'Better Auth', 'FBS', 'Razorpay'],
+		githubUrl: 'https://github.com/jR4dh3y/qckpages',
+		liveUrl: 'https://qckpage.jr4.in/'
+	},
+	{
 		title: 'Victus Control (HPOmen-linux)',
 		desc: [
 			'Linux-first control surface for HP Victus hardware with a GTK4 monitor window, GTK3 tray companion, and probe CLI.',

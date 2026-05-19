@@ -172,43 +172,41 @@ export const workspaces: WorkspaceMeta[] = [
 			},
 			{
 				id: 'details-column',
-				className: 'flex-col w-pane-half',
+				className: 'workspace-2-details-column flex-col w-pane-half overflow-visible',
 				children: [
 					{
 						id: 'experience-row',
-						className: 'min-h-0 flex-[55]',
-						panes: [panes.experience]
-					},
-					{
-						id: 'mini-pane-row',
-						className: 'min-h-0 flex-[45]',
+						className:
+							'workspace-2-overflow-row workspace-2-experience-row min-h-0 flex-[55] overflow-visible',
 						children: [
 							{
-								id: 'certifications-column',
-								className: 'min-w-0 flex-1',
-								panes: [panes.certifications]
+								id: 'experience-pane-col',
+								className: 'min-w-0',
+								panes: [panes.experience]
 							},
 							{
 								id: 'spotify-column',
-								className: 'min-w-0 flex-1',
+								className: 'min-w-0',
 								panes: [panes.spotify]
 							}
 						]
-					}
-				]
-			},
-			{
-				id: 'achivements-column',
-				className: 'flex-col w-pane-half',
-				children: [
-					{
-						id: 'achivements-row',
-						className: 'min-h-0 flex-[55]',
-						panes: [panes.achivements]
 					},
 					{
-						id: 'achivements-spacer-row',
-						className: 'min-h-0 flex-[45]'
+						id: 'mini-pane-row',
+						className:
+							'workspace-2-overflow-row workspace-2-mini-row min-h-0 flex-[45] overflow-visible',
+						children: [
+							{
+								id: 'certifications-column',
+								className: 'min-w-0',
+								panes: [panes.certifications]
+							},
+							{
+								id: 'achivements-column',
+								className: 'min-w-0',
+								panes: [panes.achivements]
+							}
+						]
 					}
 				]
 			}
@@ -297,22 +295,22 @@ const paneNeighbors: Record<PaneId, Partial<Record<Direction, PaneId>>> = {
 	},
 	experience: {
 		left: 'projects',
-		right: 'achivements',
+		right: 'spotify',
 		up: 'skills',
 		down: 'certifications'
 	},
 	achivements: {
-		left: 'experience',
-		down: 'spotify'
+		left: 'certifications',
+		up: 'spotify'
 	},
 	certifications: {
 		left: 'projects',
-		right: 'spotify',
+		right: 'achivements',
 		up: 'experience'
 	},
 	spotify: {
-		left: 'certifications',
-		up: 'experience'
+		left: 'experience',
+		down: 'achivements'
 	}
 };
 

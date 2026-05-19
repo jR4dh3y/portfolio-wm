@@ -12,6 +12,13 @@
 - dont write monolithic files, break them down into smaller, reusable pieces
 - use components for UI
 
+## TWM workspace layout notes:
+
+- Workspace pane layout is data-driven from `src/lib/components/twm/layout.ts`, with shared desktop layout primitives in `src/routes/layout.css`.
+- For workspace 2, keep the top row (`experience + spotify`) and bottom row (`certifications + achievements`) aligned through the shared `workspace-2-overflow-row` grid rules in `layout.css`.
+- Do not try to align the Spotify and achievements right borders by manually guessing unrelated `vw` widths or subtracting random gap values in `layout.ts`; update the shared CSS variables/grid columns instead.
+- If changing the Spotify width, update `--workspace-2-spotify-width` in `src/routes/layout.css` so both rows continue to share the same total overflow width.
+
 ## Before You Start Coding
 
 ### Ask Yourself:

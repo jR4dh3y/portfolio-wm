@@ -186,6 +186,24 @@
 		.workspace-column-stack.workspace-column {
 			gap: var(--workspace-pane-gap);
 		}
+
+		.workspace-2-details-column {
+			--workspace-2-spotify-width: 32vw;
+			--workspace-2-certifications-width: 24vw;
+		}
+
+		.workspace-2-overflow-row {
+			display: grid;
+			width: calc(100% + var(--workspace-pane-gap) + var(--workspace-2-spotify-width));
+		}
+
+		.workspace-2-experience-row {
+			grid-template-columns: minmax(0, 1fr) var(--workspace-2-spotify-width);
+		}
+
+		.workspace-2-mini-row {
+			grid-template-columns: var(--workspace-2-certifications-width) minmax(0, 1fr);
+		}
 	}
 }
 
