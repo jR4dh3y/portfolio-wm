@@ -30,9 +30,30 @@ export const experience = [
 		role: 'Cloud and DevOps Lead',
 		period: 'Jan 2026 - Present',
 		description:
-			'Leading cloud and DevOps initiatives as part of the core team.\nDriving adoption of AWS cloud technologies and implementing DevOps best practices through workshops, projects, and mentoring.',
+			'Part of the core team, helping shape cloud and DevOps sessions around practical workflows.\nI focus on workshops, small projects, and mentoring that make AWS, CI/CD, Docker, and deployment habits feel less like buzzwords.',
 		skills: ['AWS', 'DevOps', 'CI/CD', 'Docker', 'Kubernetes', 'Terraform'],
 		links: []
+	}
+];
+
+export type Achievement = {
+	title: string;
+	organization: string;
+	location: string;
+	period: string;
+	highlights: string[];
+};
+
+export const achievements: Achievement[] = [
+	{
+		title: 'IDE Bootcamp Edition 3 Team Leader - 2nd Place',
+		organization: 'Innovation, Design, and Entrepreneurship Bootcamp',
+		location: 'GNDEC, Ludhiana, Punjab',
+		period: 'Apr 2026',
+		highlights: [
+			'Led the team that placed 2nd with an AI-powered B2B SaaS prototype for generating presentations from uploaded templates and documents.',
+			"The bootcamp, organized by AICTE and MoE's Innovation Cell, was a good reminder that a strong technical idea still needs fast prototyping, clear positioning, and a product story people understand quickly."
+		]
 	}
 ];
 

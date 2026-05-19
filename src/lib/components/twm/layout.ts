@@ -1,5 +1,6 @@
 import type { Component } from 'svelte';
 
+import AchivementsPane from '$lib/components/twm/AchivementsPane.svelte';
 import AboutPane from '$lib/components/twm/AboutPane.svelte';
 import CertificationsPane from '$lib/components/twm/CertificationsPane.svelte';
 import ExperiencePane from '$lib/components/twm/ExperiencePane.svelte';
@@ -18,6 +19,7 @@ export type PaneId =
 	| 'skills'
 	| 'projects'
 	| 'experience'
+	| 'achivements'
 	| 'certifications'
 	| 'spotify';
 export type WorkspaceId = 'workspace-1' | 'workspace-2' | 'workspace-3';
@@ -112,6 +114,13 @@ export const panes: Record<PaneId, PaneMeta> = {
 		component: ExperiencePane,
 		className: 'h-full'
 	},
+	achivements: {
+		id: 'achivements',
+		title: 'achievements.md',
+		shortcut: '0',
+		component: AchivementsPane,
+		className: 'h-full'
+	},
 	certifications: {
 		id: 'certifications',
 		title: 'certifications.log',
@@ -185,6 +194,21 @@ export const workspaces: WorkspaceMeta[] = [
 								panes: [panes.spotify]
 							}
 						]
+					}
+				]
+			},
+			{
+				id: 'achivements-column',
+				className: 'flex-col w-pane-half',
+				children: [
+					{
+						id: 'achivements-row',
+						className: 'min-h-0 flex-[55]',
+						panes: [panes.achivements]
+					},
+					{
+						id: 'achivements-spacer-row',
+						className: 'min-h-0 flex-[45]'
 					}
 				]
 			}
@@ -273,9 +297,13 @@ const paneNeighbors: Record<PaneId, Partial<Record<Direction, PaneId>>> = {
 	},
 	experience: {
 		left: 'projects',
-		right: 'spotify',
+		right: 'achivements',
 		up: 'skills',
 		down: 'certifications'
+	},
+	achivements: {
+		left: 'experience',
+		down: 'spotify'
 	},
 	certifications: {
 		left: 'projects',

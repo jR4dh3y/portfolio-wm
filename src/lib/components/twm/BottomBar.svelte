@@ -54,7 +54,8 @@
 		<span
 			class="inline-flex items-center border border-accent bg-accent px-2 py-1 text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
 		>
-			{name.toLowerCase()}@{lastName.toLowerCase()}
+			{name.toLowerCase()}
+			{lastName.toLowerCase()}
 		</span>
 	{:else if appletId === 'role'}
 		<span
