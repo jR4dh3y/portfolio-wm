@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ArrowUpRight, Github } from 'lucide-svelte';
+	import ProjectMetrics from '$lib/components/ProjectMetrics.svelte';
 	import type { Project } from '$lib/data';
 
 	let {
@@ -59,6 +60,8 @@
 			</a>
 		{/if}
 	</div>
+
+	<ProjectMetrics metricValues={project.metricValues} variant="overlay" />
 
 	<div
 		class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100"

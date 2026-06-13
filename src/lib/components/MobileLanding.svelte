@@ -1,5 +1,14 @@
 <script lang="ts">
-	import { profile, socialLinks, projects, experience, certifications, skills } from '$lib/data';
+	import {
+		profile,
+		socialLinks,
+		projects as defaultProjects,
+		experience,
+		certifications,
+		skills
+	} from '$lib/data';
+	import ProjectMetrics from '$lib/components/ProjectMetrics.svelte';
+	import { getProjectsContext } from '$lib/project-context';
 	import {
 		Download,
 		Github,
@@ -22,6 +31,8 @@
 	function getIcon(name: string) {
 		return iconMap[name] ?? ExternalLink;
 	}
+
+	const projects = getProjectsContext() ?? defaultProjects;
 
 	let showMoreProjects = $state(false);
 </script>
@@ -144,6 +155,7 @@
 						<h3 class="text-sm font-bold tracking-tight text-fg">
 							{project.title}
 						</h3>
+						<ProjectMetrics metricValues={project.metricValues} variant="compact" />
 
 						<div class="mt-auto flex flex-col gap-2">
 							<div class="flex flex-wrap gap-1">
@@ -201,9 +213,10 @@
 					<div class="mt-3">
 						{#each projects.slice(4) as project (project.title)}
 							<div class="flex items-center justify-between gap-3 border-b border-border py-3">
-								<div class="min-w-0 flex-1">
+								<div class="flex min-w-0 flex-1 flex-col gap-1">
 									<span class="font-mono text-sm text-fg">{project.title}</span>
 									<p class="truncate font-mono text-[11px] text-dim">{project.desc[0]}</p>
+									<ProjectMetrics metricValues={project.metricValues} variant="compact" />
 								</div>
 								<div class="flex shrink-0 items-center gap-1.5">
 									<a

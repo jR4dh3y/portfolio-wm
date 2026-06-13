@@ -12,6 +12,7 @@
 		clearReturnToPane
 	} from '$lib/stores/project-navigation';
 	import MobileLanding from '$lib/components/MobileLanding.svelte';
+	import { setProjectsContext } from '$lib/project-context';
 	import {
 		bottomBarAppletPlacements,
 		getFirstPaneIdForWorkspace,
@@ -54,6 +55,7 @@
 	}
 
 	let { data }: { data: PageData } = $props();
+	setProjectsContext(untrack(() => data.projects));
 
 	let activePaneId = $state<PaneId>('hero');
 	let time = $state(new Date().toLocaleTimeString());
@@ -79,9 +81,23 @@
 		return prefersReducedMotion ? 'auto' : 'smooth';
 	}
 
+	function blurFocusedPaneOutsideWorkspace(workspaceId: WorkspaceId) {
+		const activeEl = document.activeElement as HTMLElement | null;
+		const paneEl = activeEl?.closest('.pane') as HTMLElement | null;
+		if (!paneEl) {
+			return;
+		}
+
+		const paneId = paneEl.dataset.paneId as PaneId | undefined;
+		if (paneId && getWorkspaceIdForPane(paneId) !== workspaceId) {
+			activeEl?.blur();
+		}
+	}
+
 	function focusPane(paneId: PaneId, shouldFocus = true) {
+		const paneWorkspaceId = getWorkspaceIdForPane(paneId);
 		activePaneId = paneId;
-		activeWorkspaceId = getWorkspaceIdForPane(paneId);
+		activeWorkspaceId = paneWorkspaceId;
 
 		if (!isDesktop) {
 			return;
@@ -89,7 +105,7 @@
 
 		const behavior = getScrollBehavior();
 		const pane = document.getElementById(`pane-${paneId}`);
-		const workspace = document.getElementById(`workspace-${getWorkspaceIdForPane(paneId)}`);
+		const workspace = document.getElementById(`workspace-${paneWorkspaceId}`);
 		const column = pane?.closest<HTMLElement>('[data-column-id]');
 
 		workspace?.scrollIntoView({ behavior, block: 'center', inline: 'nearest' });
@@ -98,6 +114,8 @@
 
 		if (shouldFocus) {
 			pane?.focus({ preventScroll: true });
+		} else {
+			blurFocusedPaneOutsideWorkspace(paneWorkspaceId);
 		}
 	}
 
@@ -118,6 +136,8 @@
 		const firstPaneId = getFirstPaneIdForWorkspace(workspaceId);
 		if (firstPaneId) {
 			focusPane(firstPaneId, false);
+		} else {
+			blurFocusedPaneOutsideWorkspace(workspaceId);
 		}
 	}
 
@@ -195,6 +215,7 @@
 
 		if (nearestWorkspaceId) {
 			activeWorkspaceId = nearestWorkspaceId;
+			blurFocusedPaneOutsideWorkspace(nearestWorkspaceId);
 		}
 	}
 
@@ -315,19 +336,6 @@
 	}
 
 	let isPaneFocused = $state(false);
-
-	$effect(() => {
-		if (activeWorkspaceId && typeof document !== 'undefined') {
-			const activeEl = document.activeElement as HTMLElement | null;
-			const paneEl = activeEl?.closest('.pane') as HTMLElement | null;
-			if (paneEl) {
-				const paneId = paneEl.dataset.paneId as PaneId | undefined;
-				if (paneId && getWorkspaceIdForPane(paneId) !== activeWorkspaceId) {
-					activeEl?.blur();
-				}
-			}
-		}
-	});
 
 	function handleFocusIn(event: FocusEvent) {
 		const target = event.target as HTMLElement | null;

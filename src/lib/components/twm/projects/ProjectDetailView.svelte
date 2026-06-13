@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ArrowUpRight, Github, StepBack } from 'lucide-svelte';
+	import ProjectMetrics from '$lib/components/ProjectMetrics.svelte';
 	import type { Project } from '$lib/data';
 
 	let {
@@ -30,9 +31,12 @@
 			</button>
 		</div>
 		<div class="absolute right-4 bottom-4 left-4 flex flex-wrap items-end justify-between gap-3">
-			<h3 class="text-2xl font-bold tracking-tight text-fg uppercase sm:text-3xl">
-				{project.title}
-			</h3>
+			<div class="flex min-w-0 flex-col gap-2">
+				<h3 class="text-2xl font-bold tracking-tight text-fg uppercase sm:text-3xl">
+					{project.title}
+				</h3>
+				<ProjectMetrics metricValues={project.metricValues} />
+			</div>
 			<div class="flex gap-2">
 				<a
 					href={project.githubUrl}

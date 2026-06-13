@@ -160,6 +160,27 @@ export type Project = {
 	githubUrl: string;
 	liveUrl?: string;
 	buttonTheme?: 'dark' | 'light';
+	metrics?: ProjectMetricSettings;
+	metricValues?: ProjectMetricValues;
+};
+
+export type ProjectMetricSettings = {
+	stars?: boolean;
+	downloads?: ProjectDownloadMetricSource;
+};
+
+export type ProjectDownloadMetricSource =
+	| 'github-releases'
+	| {
+			source: 'ghcr';
+			package: string;
+			owner?: string;
+			ownerType?: 'user' | 'org';
+	  };
+
+export type ProjectMetricValues = {
+	stars: number | null;
+	downloads: number | null;
 };
 
 export const projects: Project[] = [
@@ -183,7 +204,11 @@ export const projects: Project[] = [
 		image: '/assets/fbs.png',
 		tags: ['Go', 'S3', 'CDN', 'Docker', 'Self-Hosting', 'SQlight'],
 		githubUrl: 'https://github.com/i-got-this-faa/fbs-core',
-		liveUrl: 'https://fbs-landing.vercel.app/'
+		liveUrl: 'https://fbs-landing.vercel.app/',
+		metrics: {
+			stars: true,
+			downloads: { source: 'ghcr', package: 'fbs-core', ownerType: 'org' }
+		}
 	},
 	{
 		title: 'BoxBox',
@@ -193,9 +218,13 @@ export const projects: Project[] = [
 			'Supports live media preview, streaming, downloads, and Monaco Editor integration for in-browser file editing.'
 		],
 		image: '/assets/files.png',
-		tags: ['SvelteKit', 'Go', 'Docker', 'WebSocket'],
+		tags: ['SvelteKit', 'Go', 'Docker', 'WebSocket', 'Self-Hosting'],
 		githubUrl: 'https://github.com/jR4dh3y/boxbox',
-		liveUrl: 'https://boxbox.radhey.dev/'
+		liveUrl: 'https://boxbox.radhey.dev/',
+		metrics: {
+			stars: true,
+			downloads: { source: 'ghcr', package: 'boxbox' }
+		}
 	},
 	{
 		title: 'QckPages',
@@ -216,7 +245,11 @@ export const projects: Project[] = [
 		],
 		image: '/assets/omenmon.png',
 		tags: ['Vala', 'GTK4', 'D-Bus', 'Linux', 'Meson', 'AppIndicator'],
-		githubUrl: 'https://github.com/jR4dh3y/HPOmen-linux'
+		githubUrl: 'https://github.com/jR4dh3y/HPOmen-linux',
+		metrics: {
+			stars: true,
+			downloads: 'github-releases'
+		}
 	},
 	{
 		title: 'Niri Dotfiles',
@@ -226,7 +259,38 @@ export const projects: Project[] = [
 		image: '/assets/dots-niri.png',
 		tags: ['Niri', 'Wayland', 'Arch Linux', 'Shell', 'Ricing', 'Unix-Porn'],
 		liveUrl: 'https://rice.jr4.in',
-		githubUrl: 'https://github.com/jR4dh3y/dots-niri'
+		githubUrl: 'https://github.com/jR4dh3y/dots-niri',
+		metrics: {
+			stars: true
+		}
+	},
+	{
+		title: 'Codex Account Switcher',
+		desc: [
+			'GTK/libadwaita app for managing multiple ChatGPT accounts for Codex CLI through OpenAI OAuth.',
+			'Shows remaining Codex usage, reset windows, and switches the active CLI account by updating Codex auth without manually editing files.'
+		],
+		image: '/assets/codex-account-switcher.png',
+		tags: ['Vala', 'GTK4', 'libadwaita', 'OpenAI OAuth', 'Codex CLI', 'Linux'],
+		githubUrl: 'https://github.com/jR4dh3y/codex-account-switcher',
+		metrics: {
+			stars: true,
+			downloads: 'github-releases'
+		}
+	},
+	{
+		title: 'rsclip',
+		desc: [
+			'Wayland clipboard manager with a low-memory Rust daemon and resident GTK4 overlay UI.',
+			'Captures text and image history into SQLite, supports search, filters, previews, auto-paste, OCR plumbing, and optional link favicon caching.'
+		],
+		image: '/assets/rsclip.png',
+		tags: ['Rust', 'GTK4', 'Wayland', 'SQLite', 'Clipboard', 'Linux'],
+		githubUrl: 'https://github.com/jR4dh3y/rsclip',
+		metrics: {
+			stars: true,
+			downloads: 'github-releases'
+		}
 	},
 	{
 		title: 'Pico32',
@@ -237,7 +301,11 @@ export const projects: Project[] = [
 		image: 'https://raw.githubusercontent.com/jR4dh3y/Pico32/master/assets/ss.png',
 		tags: ['ESP32', 'C++', 'PlatformIO', 'IoT', 'Firmware', 'WiFi', 'BLE'],
 		liveUrl: 'https://pico32.radhey.dev',
-		githubUrl: 'https://github.com/jR4dh3y/Pico32'
+		githubUrl: 'https://github.com/jR4dh3y/Pico32',
+		metrics: {
+			stars: true,
+			downloads: 'github-releases'
+		}
 	},
 	{
 		title: 'WallpyGui',

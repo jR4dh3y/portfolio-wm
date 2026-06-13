@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { projects } from '$lib/data';
+	import { onMount } from 'svelte';
+	import { projects as defaultProjects } from '$lib/data';
 	import ProjectCard from '$lib/components/twm/projects/ProjectCard.svelte';
 	import ProjectDetailView from '$lib/components/twm/projects/ProjectDetailView.svelte';
+	import { getProjectsContext } from '$lib/project-context';
 	import {
 		projectNavigationRequest,
 		projectDetailCloseRequest,
@@ -11,9 +13,12 @@
 	} from '$lib/stores/project-navigation';
 	import type { PaneId } from '$lib/components/twm/layout';
 
+	const contextProjects = getProjectsContext();
+	const projects = contextProjects ?? defaultProjects;
+	const projectsListContainerId = 'projects-list-container';
+
 	let selectedProjectIndex = $state<number | null>(null);
 	let lastFocusedCardId = $state('');
-	let projectsListContainer = $state<HTMLDivElement | null>(null);
 	let projectsListScrollTop = 0;
 	let sourcePane = $state<PaneId>('projects');
 
@@ -29,8 +34,12 @@
 			.replace(/(^-|-$)+/g, '');
 	}
 
+	function getProjectsListContainer(): HTMLDivElement | null {
+		return document.getElementById(projectsListContainerId) as HTMLDivElement | null;
+	}
+
 	function openProject(index: number, nextSourcePane: PaneId = 'projects') {
-		projectsListScrollTop = projectsListContainer?.scrollTop ?? projectsListScrollTop;
+		projectsListScrollTop = getProjectsListContainer()?.scrollTop ?? projectsListScrollTop;
 		lastFocusedCardId = `project-card-${index}`;
 		sourcePane = nextSourcePane;
 		selectedProjectIndex = index;
@@ -57,9 +66,8 @@
 		}
 
 		requestAnimationFrame(() => {
-			if (projectsListContainer) {
-				projectsListContainer.scrollTop = projectsListScrollTop;
-			}
+			const projectsListContainer = getProjectsListContainer();
+			projectsListContainer?.scrollTo({ top: projectsListScrollTop });
 		});
 
 		if (!focusedCardId) {
@@ -87,36 +95,41 @@
 	let lastProcessedNavigationNonce = 0;
 	let lastProcessedCloseNonce = 0;
 
-	$effect(() => {
-		const request = $projectNavigationRequest;
-		if (!request || request.nonce === lastProcessedNavigationNonce) {
-			return;
-		}
+	onMount(() => {
+		const unsubscribeNavigation = projectNavigationRequest.subscribe((request) => {
+			if (!request || request.nonce === lastProcessedNavigationNonce) {
+				return;
+			}
 
-		lastProcessedNavigationNonce = request.nonce;
+			lastProcessedNavigationNonce = request.nonce;
 
-		const nextIndex = projects.findIndex((project) => {
-			const projectSlug = project.slug ?? toProjectSlug(project.title);
-			return projectSlug === request.slug;
+			const nextIndex = projects.findIndex((project) => {
+				const projectSlug = project.slug ?? toProjectSlug(project.title);
+				return projectSlug === request.slug;
+			});
+
+			if (nextIndex === -1) {
+				return;
+			}
+
+			openProject(nextIndex, request.sourcePane ?? 'projects');
 		});
 
-		if (nextIndex === -1) {
-			return;
-		}
+		const unsubscribeClose = projectDetailCloseRequest.subscribe((closeRequest) => {
+			if (!closeRequest || closeRequest === lastProcessedCloseNonce) {
+				return;
+			}
 
-		openProject(nextIndex, request.sourcePane ?? 'projects');
-	});
+			lastProcessedCloseNonce = closeRequest;
+			selectedProjectIndex = null;
+			lastFocusedCardId = '';
+			sourcePane = 'projects';
+		});
 
-	$effect(() => {
-		const closeRequest = $projectDetailCloseRequest;
-		if (!closeRequest || closeRequest === lastProcessedCloseNonce) {
-			return;
-		}
-
-		lastProcessedCloseNonce = closeRequest;
-		selectedProjectIndex = null;
-		lastFocusedCardId = '';
-		sourcePane = 'projects';
+		return () => {
+			unsubscribeNavigation();
+			unsubscribeClose();
+		};
 	});
 </script>
 
@@ -126,8 +139,8 @@
 	<ProjectDetailView project={selectedProject} onBack={closeProject} />
 {:else}
 	<div
+		id={projectsListContainerId}
 		class="no-scrollbar h-full w-full overflow-y-auto p-4 sm:p-8"
-		bind:this={projectsListContainer}
 		onscroll={handleProjectsListScroll}
 	>
 		<div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
