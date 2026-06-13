@@ -19,6 +19,7 @@
 	<div class="relative aspect-video w-full overflow-hidden border border-border bg-bg">
 		<img src={project.image} alt={project.title} class="h-full w-full object-cover" />
 		<div class="absolute inset-0 bg-gradient-to-t from-bg via-bg/70 to-transparent"></div>
+		<ProjectMetrics metricValues={project.metricValues} variant="overlay" />
 		<div class="absolute top-4 right-4 z-10 flex flex-wrap items-center gap-2">
 			<button
 				type="button"
@@ -35,7 +36,6 @@
 				<h3 class="text-2xl font-bold tracking-tight text-fg uppercase sm:text-3xl">
 					{project.title}
 				</h3>
-				<ProjectMetrics metricValues={project.metricValues} />
 			</div>
 			<div class="flex gap-2">
 				<a
